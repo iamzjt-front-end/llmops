@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="AI Agent 全栈开发工程师课程进度追踪器，共 546 节视频。"
+    />
+    <meta name="theme-color" content="#11130f" />
+    <title>LLMOps 学习进度</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#course-list">跳到课程列表</a>
+
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="返回页面顶部">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>LLMOPS</span>
+        <span class="brand-subtitle">LEARNING TRACKER</span>
+      </a>
+
+      <div class="topbar-actions">
+        <button class="sync-button" id="sync-button" type="button" aria-haspopup="dialog">
+          <span class="sync-dot" aria-hidden="true"></span>
+          <span id="sync-status">仅本地</span>
+        </button>
+        <button class="text-button" id="export-button" type="button">导出</button>
+        <button class="text-button" id="import-button" type="button">导入</button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="progress-hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">20 周 · 8 个阶段 · 546 节视频</p>
+          <h1 id="page-title">AI Agent<br />全栈开发工程师</h1>
+          <p class="hero-description">
+            每完成一节就勾掉一节。本机即时保存，也可以通过 Cloudflare KV 跨设备同步。
+          </p>
+        </div>
+
+        <div class="progress-overview" aria-label="课程总进度">
+          <div class="progress-number-row">
+            <span class="progress-percent" id="progress-percent">0%</span>
+            <span class="progress-caption" id="progress-caption">准备开始</span>
+          </div>
+          <div
+            class="progress-track"
+            id="progress-track"
+            role="progressbar"
+            aria-label="课程完成度"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
+            <span class="progress-fill" id="progress-fill"></span>
+          </div>
+          <dl class="progress-stats">
+            <div>
+              <dt>已完成</dt>
+              <dd id="completed-count">0</dd>
+            </div>
+            <div>
+              <dt>剩余</dt>
+              <dd id="remaining-count">546</dd>
+            </div>
+            <div>
+              <dt>总计</dt>
+              <dd id="total-count">546</dd>
+            </div>
+          </dl>
+          <button class="continue-button" id="continue-button" type="button">
+            <span>继续学习</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M14 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="课程学习工作区">
+        <aside class="stage-sidebar" aria-label="阶段导航">
+          <div class="sidebar-heading">
+            <span>课程地图</span>
+            <span id="stage-summary">8 个阶段</span>
+          </div>
+          <nav id="stage-navigation"></nav>
+          <button class="reset-button" id="reset-button" type="button">重置全部进度</button>
+        </aside>
+
+        <div class="course-workspace">
+          <div class="toolbar">
+            <label class="search-field" for="search-input">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m16 16 4 4" />
+              </svg>
+              <input
+                id="search-input"
+                type="search"
+                autocomplete="off"
+                placeholder="搜索课程、章节或编号"
+              />
+              <kbd>⌘ K</kbd>
+            </label>
+
+            <div class="filter-tabs" role="group" aria-label="完成状态筛选">
+              <button class="filter-tab is-active" data-filter="all" type="button">全部</button>
+              <button class="filter-tab" data-filter="todo" type="button">未完成</button>
+              <button class="filter-tab" data-filter="done" type="button">已完成</button>
+            </div>
+
+            <button class="collapse-button" id="collapse-button" type="button">全部折叠</button>
+          </div>
+
+          <div class="results-meta" aria-live="polite">
+            <span id="results-count">显示 546 节</span>
+            <span id="active-context">完整课程</span>
+          </div>
+
+          <div id="course-list" class="course-list"></div>
+
+          <div class="empty-state" id="empty-state" hidden>
+            <span>没有匹配的课程</span>
+            <button id="clear-filters-button" type="button">清除筛选</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>本机即时保存</span>
+      <span>Cloudflare KV 云同步</span>
+    </footer>
+
+    <input id="import-file" type="file" accept="application/json,.json" hidden />
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <dialog class="sync-dialog" id="sync-dialog">
+      <form id="sync-form" method="dialog">
+        <div class="dialog-heading">
+          <div>
+            <p class="dialog-kicker">Cloudflare KV Sync</p>
+            <h2>同步学习进度</h2>
+          </div>
+          <button class="dialog-close" id="close-sync-dialog" type="button" aria-label="关闭">×</button>
+        </div>
+        <p class="dialog-copy">
+          输入这个课程专用的同步码。进度会先保存在本机，再自动同步到你的 Cloudflare KV。
+        </p>
+        <div class="sync-endpoint">
+          <span>云端地址</span>
+          <code id="sync-endpoint"></code>
+        </div>
+        <label class="field-label" for="sync-secret">同步码</label>
+        <input
+          class="field-input"
+          id="sync-secret"
+          type="password"
+          autocomplete="off"
+          placeholder="输入 Cloudflare Worker 的同步码"
+          required
+        />
+        <p class="dialog-error" id="sync-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button class="text-button" id="disconnect-sync" type="button">停止云同步</button>
+          <span></span>
+          <button class="text-button" id="cancel-sync-dialog" type="button">取消</button>
+          <button class="sync-submit" type="submit">保存并同步</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="./course-data.js"></script>
+    <script src="./sync-config.js"></script>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

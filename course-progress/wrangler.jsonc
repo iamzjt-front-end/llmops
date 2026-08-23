@@ -1,0 +1,20 @@
+{
+	"$schema": "https://developers.cloudflare.com/workers/wrangler/config-schema.json",
+	"name": "llmops-course-progress",
+	"main": "worker/src/index.mjs",
+	"compatibility_date": "2026-08-23",
+	"workers_dev": true,
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS"
+	},
+	"vars": {
+		"ALLOWED_ORIGINS": "http://127.0.0.1:4173,http://localhost:4173"
+	},
+	"kv_namespaces": [
+		{
+			"binding": "PROGRESS",
+			"id": "ff5a58588cb84268b11ba08c273d2ac9"
+		}
+	]
+}
