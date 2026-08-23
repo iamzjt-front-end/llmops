@@ -2,6 +2,8 @@
 
 AI Agent 全栈开发工程师课程的学习进度网页，共 546 节视频、8 个阶段、24 个周单元。
 
+每个章支持一键全选或取消全选；部分完成时会显示中间状态。
+
 线上地址：<https://llmops-course-progress.itsjtide.workers.dev>
 
 ## 进度保存在哪里

@@ -613,6 +613,110 @@ kbd {
   font-variant-numeric: tabular-nums;
 }
 
+.chapter-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  margin: 18px 0 8px;
+}
+
+.chapter-title {
+  min-width: 0;
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapter-select-all {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.chapter-select-all:hover,
+.chapter-select-all:focus-visible {
+  border-color: var(--line-strong);
+  background: rgba(241, 243, 233, 0.04);
+  color: var(--text);
+}
+
+.chapter-select-all:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.chapter-select-box {
+  position: relative;
+  display: grid;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.chapter-select-box svg {
+  width: 11px;
+  fill: none;
+  stroke: #11130f;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+  opacity: 0;
+}
+
+.chapter-select-box > span {
+  position: absolute;
+  width: 7px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--accent);
+  opacity: 0;
+}
+
+.chapter-select-all[data-state="partial"] .chapter-select-box {
+  border-color: var(--accent);
+}
+
+.chapter-select-all[data-state="partial"] .chapter-select-box > span {
+  opacity: 1;
+}
+
+.chapter-select-all[data-state="complete"] {
+  color: var(--text);
+}
+
+.chapter-select-all[data-state="complete"] .chapter-select-box {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.chapter-select-all[data-state="complete"] .chapter-select-box svg {
+  opacity: 1;
+}
+
+.chapter-select-count {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .chevron {
   width: 18px;
   height: 18px;
@@ -652,14 +756,6 @@ kbd {
 
 .chapter-group {
   padding: 4px 0 28px 88px;
-}
-
-.chapter-title {
-  margin: 18px 0 8px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .lesson-row {
@@ -1087,6 +1183,18 @@ footer {
 
   .chapter-group {
     padding-left: 0;
+  }
+
+  .chapter-header {
+    gap: 8px;
+  }
+
+  .chapter-select-all {
+    padding-inline: 5px;
+  }
+
+  .chapter-select-count {
+    display: none;
   }
 
   .lesson-row {

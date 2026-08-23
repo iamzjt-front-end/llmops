@@ -9,6 +9,7 @@ const assets = [
   "styles.css",
   "app.js",
   "cloud-sync.mjs",
+  "progress-selection.mjs",
   "sync-config.js",
   "course-data.js",
   "favicon.svg",

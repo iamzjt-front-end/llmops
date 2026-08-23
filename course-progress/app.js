@@ -7,6 +7,10 @@ import {
   normalizeProgress,
   saveLocalProgress,
 } from "./cloud-sync.mjs";
+import {
+  getBulkSelectionState,
+  toggleBulkSelection,
+} from "./progress-selection.mjs";
 
 (function () {
   "use strict";
@@ -27,6 +31,9 @@ import {
   const lessonIds = new Set(lessons.map((lesson) => lesson.id));
   const stages = groupBy(lessons, (lesson) => lesson.stageOrder);
   const weekKeyFor = (lesson) => `${lesson.stageOrder}:${lesson.weekUnit}`;
+  const weekGroups = groupBy(lessons, weekKeyFor);
+  const chapterKeyFor = (lesson) => `${weekKeyFor(lesson)}:${lesson.chapter}`;
+  const chapterGroups = groupBy(lessons, chapterKeyFor);
   const syncEndpoint = normalizeEndpoint(
     window.COURSE_SYNC_ENDPOINT || (window.location.protocol === "https:" ? window.location.origin : ""),
   );
@@ -110,6 +117,12 @@ import {
     });
 
     elements.courseList.addEventListener("click", (event) => {
+      const selectAll = event.target.closest("[data-chapter-select-key]");
+      if (selectAll) {
+        setChapterComplete(selectAll.dataset.chapterSelectKey);
+        return;
+      }
+
       const toggle = event.target.closest("[data-week-key]");
       if (!toggle) return;
 
@@ -306,9 +319,10 @@ import {
 
   function renderWeek(weekUnit, weekLessons) {
     const key = weekKeyFor(weekLessons[0]);
+    const allWeekLessons = weekGroups.get(key) || weekLessons;
     const isSearchExpanded = Boolean(state.query);
     const isOpen = isSearchExpanded || state.expandedWeeks.has(key);
-    const completed = weekLessons.filter((lesson) => state.completed.has(lesson.id)).length;
+    const completed = allWeekLessons.filter((lesson) => state.completed.has(lesson.id)).length;
     const chapters = groupBy(weekLessons, (lesson) => lesson.chapter);
 
     return `
@@ -319,9 +333,9 @@ import {
           data-week-key="${escapeAttribute(key)}"
           aria-expanded="${isOpen}"
         >
-          <span class="week-label">${escapeHtml(weekLessons[0].week)}</span>
+          <span class="week-label">${escapeHtml(allWeekLessons[0].week)}</span>
           <span class="week-title">${escapeHtml(weekUnit.replace(/^第\s*\d+\s*周\s*(上|下)?\s*/, ""))}</span>
-          <span class="week-meta">${completed} / ${weekLessons.length}</span>
+          <span class="week-meta">${completed} / ${allWeekLessons.length}</span>
           <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
         </button>
         <div class="week-content ${isOpen ? "is-open" : ""}">
@@ -334,9 +348,39 @@ import {
   }
 
   function renderChapter(chapter, chapterLessons) {
+    const key = chapterKeyFor(chapterLessons[0]);
+    const allChapterLessons = chapterGroups.get(key) || chapterLessons;
+    const selection = getBulkSelectionState(
+      allChapterLessons.map((lesson) => lesson.id),
+      state.completed,
+    );
+    const selectState = selection.isAllComplete
+      ? "complete"
+      : selection.isPartial
+        ? "partial"
+        : "empty";
+    const selectLabel = selection.isAllComplete ? "取消全选" : "全选本章";
+
     return `
       <section class="chapter-group">
-        <h3 class="chapter-title">${escapeHtml(chapter)}</h3>
+        <div class="chapter-header">
+          <h3 class="chapter-title">${escapeHtml(chapter)}</h3>
+          <button
+            class="chapter-select-all"
+            type="button"
+            data-chapter-select-key="${escapeAttribute(key)}"
+            data-state="${selectState}"
+            aria-pressed="${selection.isPartial ? "mixed" : selection.isAllComplete}"
+            aria-label="${escapeAttribute(`${selectLabel}：${chapter}，已完成 ${selection.completedCount} 节，共 ${selection.total} 节`)}"
+          >
+            <span class="chapter-select-box" aria-hidden="true">
+              <svg viewBox="0 0 16 16"><path d="m3 8 3 3 7-7" /></svg>
+              <span></span>
+            </span>
+            <span>${selectLabel}</span>
+            <span class="chapter-select-count">${selection.completedCount}/${selection.total}</span>
+          </button>
+        </div>
         <div>
           ${chapterLessons.map(renderLesson).join("")}
         </div>
@@ -383,6 +427,27 @@ import {
     renderStageNavigation();
     renderCourseList();
     scheduleCloudSync();
+  }
+
+  function setChapterComplete(key) {
+    const chapterLessons = chapterGroups.get(key);
+    if (!chapterLessons) return;
+
+    const result = toggleBulkSelection(
+      chapterLessons.map((lesson) => lesson.id),
+      state.completed,
+    );
+    state.completed = result.completed;
+    state.targetLessonId = null;
+    persistCompleted();
+    updateProgress();
+    renderStageNavigation();
+    renderCourseList();
+    scheduleCloudSync();
+
+    showToast(result.complete
+      ? `本章 ${chapterLessons.length} 节已全部完成`
+      : "本章已取消全选");
   }
 
   function focusNextLesson() {
