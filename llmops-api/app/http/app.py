@@ -1,6 +1,7 @@
 from injector import Injector
-from internal.server import Http
+
 from internal.router import Router
+from internal.server import Http
 
 injector = Injector()
 

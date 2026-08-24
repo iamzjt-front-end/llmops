@@ -1,6 +1,8 @@
 from dataclasses import dataclass
+
+from flask import Blueprint, Flask
 from injector import inject
-from flask import Flask, Blueprint
+
 from internal.handler import AppHandler
 
 
