@@ -1,14 +1,13 @@
 import os
 
-from flask import request
 from openai import OpenAI
 from openai.types.chat import (
     ChatCompletionMessageParam,
     ChatCompletionSystemMessageParam,
     ChatCompletionUserMessageParam,
 )
-from werkzeug.datastructures import MultiDict
 
+from internal.exception import FailException
 from internal.schema.app_schema import CompletionReq
 from pkg.response import success_json, validate_error_json
 
@@ -19,13 +18,7 @@ class AppHandler:
     def completion(self):
         """聊天接口"""
         # 1.提取从接口中获取的输入，POST
-        if request.is_json:
-            payload = request.get_json(silent=True)
-            formdata = MultiDict(payload if isinstance(payload, dict) else {})
-        else:
-            formdata = request.form
-
-        req = CompletionReq(formdata=formdata)
+        req = CompletionReq()
         if not req.validate():
             return validate_error_json(req.errors)
 
@@ -55,4 +48,4 @@ class AppHandler:
         return success_json({"content": content})
 
     def ping(self):
-        return {"ping": "pong"}
+        raise FailException("数据未找到")
