@@ -1,16 +1,18 @@
 from injector import Injector, inject
 
+
 class A:
-    name: str = "llmops"
+  name: str = 'llmops'
 
 
 @inject
 class B:
-    def __init__(self, a: A):
-        self.a = a
+  def __init__(self, a: A):
+    self.a = a
 
-    def print(self):
-        print(f"class A: {self.a.name}")
+  def print(self):
+    print(f'class A: {self.a.name}')
+
 
 # 创建一个“自动组装对象”的管理员
 injector = Injector()
