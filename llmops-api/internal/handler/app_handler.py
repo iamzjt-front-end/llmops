@@ -2,6 +2,15 @@ import os
 
 from flask import request
 from openai import OpenAI
+from openai.types.chat import (
+    ChatCompletionMessageParam,
+    ChatCompletionSystemMessageParam,
+    ChatCompletionUserMessageParam,
+)
+from werkzeug.datastructures import MultiDict
+
+from internal.schema.app_schema import CompletionReq
+from pkg.response import success_json, validate_error_json
 
 
 class AppHandler:
@@ -10,28 +19,40 @@ class AppHandler:
     def completion(self):
         """聊天接口"""
         # 1.提取从接口中获取的输入，POST
-        query = request.json.get("query")
+        if request.is_json:
+            payload = request.get_json(silent=True)
+            formdata = MultiDict(payload if isinstance(payload, dict) else {})
+        else:
+            formdata = request.form
+
+        req = CompletionReq(formdata=formdata)
+        if not req.validate():
+            return validate_error_json(req.errors)
 
         # 2.构建OpenAI客户端，并发起请求
         client = OpenAI(base_url=os.getenv("OPENAI_API_BASE"))
 
+        system_message: ChatCompletionSystemMessageParam = {
+            "role": "system",
+            "content": "你是OpenAI开发的聊天机器人，请根据用户的输入回复对应的信息",
+        }
+        user_message: ChatCompletionUserMessageParam = {
+            "role": "user",
+            "content": req.query.data or "",
+        }
+        messages: list[ChatCompletionMessageParam] = [
+            system_message,
+            user_message,
+        ]
+
         # 3.得到请求响应，然后将OpenAI的响应传递给前端
         completion = client.chat.completions.create(
             model="deepseek-v4-flash",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "你是OpenAI开发的聊天机器人，请根据用户的输入回复对应的信息",
-                },
-                {
-                    "role": "user",
-                    "content": query,
-                },
-            ],
+            messages=messages,
         )
 
         content = completion.choices[0].message.content
-        return content
+        return success_json({"content": content})
 
     def ping(self):
         return {"ping": "pong"}
