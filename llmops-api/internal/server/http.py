@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
 from internal.exception import CustomException
+from internal.model import App
 from internal.router import Router
 from pkg.response import Response, json
 from pkg.response.http_code import HttpCode
@@ -25,6 +26,9 @@ class Http(Flask):
 
     # 4.初始化flask扩展
     db.init_app(self)
+    with self.app_context():
+      _ = App()
+      db.create_all()
 
     # 5.注册应用路由
     router.register(self)
