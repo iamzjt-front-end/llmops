@@ -1,10 +1,10 @@
 import uuid
 from dataclasses import dataclass
 
-from flask_sqlalchemy import SQLAlchemy
 from injector import inject
 
 from internal.model import App
+from pkg.sqlalchemy import SQLAlchemy
 
 
 @inject

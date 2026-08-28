@@ -1,7 +1,7 @@
-from flask_sqlalchemy import SQLAlchemy
 from injector import Binder, Module
 
 from internal.extension import db
+from pkg.sqlalchemy import SQLAlchemy
 
 
 class ExtensionModule(Module):
