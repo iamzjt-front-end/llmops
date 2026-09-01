@@ -20,6 +20,7 @@ class App(db.Model):
   name = Column(String(255), default='', nullable=False)
   icon = Column(String(255), default='', nullable=False)
   description = Column(Text, default='', nullable=False)
+  status = Column(String(255), default='', nullable=False)
   update_time = Column(
     DateTime, default=datetime.now, onupdate=datetime.now, nullable=False
   )
