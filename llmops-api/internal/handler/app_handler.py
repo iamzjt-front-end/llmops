@@ -3,6 +3,9 @@ import uuid
 from dataclasses import dataclass
 
 from injector import inject
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_deepseek import ChatDeepSeek
 from openai import OpenAI
 from openai.types.chat import (
   ChatCompletionMessageParam,
@@ -42,34 +45,23 @@ class AppHandler:
 
   def completion(self):
     """聊天接口"""
-    # 1.提取从接口中获取的输入，POST
+    # 1.提取从接口中获取的输入
     req = CompletionReq()
     if not req.validate():
       return validate_error_json(req.errors)
 
-    # 2.构建OpenAI客户端，并发起请求
-    client = OpenAI(base_url=os.getenv('OPENAI_API_BASE'))
+    prompt = ChatPromptTemplate.from_template('{query}')
 
-    system_message: ChatCompletionSystemMessageParam = {
-      'role': 'system',
-      'content': '你是OpenAI开发的聊天机器人，请根据用户的输入回复对应的信息',
-    }
-    user_message: ChatCompletionUserMessageParam = {
-      'role': 'user',
-      'content': req.query.data or '',
-    }
-    messages: list[ChatCompletionMessageParam] = [
-      system_message,
-      user_message,
-    ]
+    # 2.构建大语言模型，并发起请求
+    llm = ChatDeepSeek(model='deepseek-v4-flash')
 
     # 3.得到请求响应，然后将OpenAI的响应传递给前端
-    completion = client.chat.completions.create(
-      model='deepseek-v4-flash',
-      messages=messages,
-    )
+    ai_message = llm.invoke(prompt.invoke({'query': req.query.data}))
 
-    content = completion.choices[0].message.content
+    # 4.解析响应内容
+    parser = StrOutputParser()
+    content = parser.invoke(ai_message)
+
     return success_json({'content': content})
 
   def ping(self):
