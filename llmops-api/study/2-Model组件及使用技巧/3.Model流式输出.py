@@ -1,0 +1,26 @@
+from datetime import UTC, datetime
+
+import dotenv
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_deepseek import ChatDeepSeek
+
+dotenv.load_dotenv()
+
+# 1.编排prompt
+prompt = ChatPromptTemplate.from_messages(
+  [
+    (
+      'system',
+      '你是OpenAI开发的聊天机器人，请根据用户的提问进行回复，现在的时间是{now}',
+    ),
+    ('human', '{query}'),
+  ]
+).partial(now=datetime.now(UTC))
+
+# 2.创建大语言模型
+llm = ChatDeepSeek(model='deepseek-v4-flash')
+
+response = llm.stream(prompt.invoke({'query': '你能简单介绍下LLM和LLMOps吗？'}))
+
+for chunk in response:
+  print(chunk.content, flush=True, end='')
