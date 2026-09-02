@@ -1,4 +1,3 @@
-import os
 import uuid
 from dataclasses import dataclass
 
@@ -6,12 +5,6 @@ from injector import inject
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_deepseek import ChatDeepSeek
-from openai import OpenAI
-from openai.types.chat import (
-  ChatCompletionMessageParam,
-  ChatCompletionSystemMessageParam,
-  ChatCompletionUserMessageParam,
-)
 
 from internal.exception import FailException
 from internal.schema.app_schema import CompletionReq
