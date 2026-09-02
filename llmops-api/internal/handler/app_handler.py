@@ -1,5 +1,5 @@
-import uuid
 from dataclasses import dataclass
+from uuid import UUID
 
 from injector import inject
 from langchain_core.output_parsers import StrOutputParser
@@ -24,16 +24,16 @@ class AppHandler:
     app = self.app_service.create_app()
     return success_message(f'应用已经创建成功，id为{app.id}')
 
-  def get_app(self, id: uuid.UUID):
-    app = self.app_service.get_app(id)
+  def get_app(self, app_id: UUID):
+    app = self.app_service.get_app(app_id)
     return success_message(f'应用已经成功获取，名字是{app.name}')
 
-  def update_app(self, id: uuid.UUID):
-    app = self.app_service.update_app(id)
+  def update_app(self, app_id: UUID):
+    app = self.app_service.update_app(app_id)
     return success_message(f'应用已经成功修改，修改的名字是{app.name}')
 
-  def delete_app(self, id: uuid.UUID):
-    app = self.app_service.delete_app(id)
+  def delete_app(self, app_id: UUID):
+    app = self.app_service.delete_app(app_id)
     return success_message(f'{app.name}应用已经成功删除')
 
   def completion(self):
