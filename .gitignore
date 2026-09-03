@@ -4,6 +4,9 @@
 # 超过 GitHub 100MB 单文件限制的大文件
 课件/第5周/weaviate.tar
 
+# 示例脚本运行时生成的对话历史
+llmops-api/study/**/chat_history*.txt
+
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
