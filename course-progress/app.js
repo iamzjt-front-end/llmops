@@ -141,7 +141,7 @@ import {
         return;
       }
 
-      const toggle = event.target.closest("[data-week-key]");
+      const toggle = event.target.closest(".week-toggle[data-week-key]");
       if (!toggle) return;
 
       const key = toggle.dataset.weekKey;
