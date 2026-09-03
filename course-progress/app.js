@@ -77,6 +77,10 @@ import {
     searchInput: document.querySelector("#search-input"),
     filterTabs: [...document.querySelectorAll(".filter-tab")],
     collapseButton: document.querySelector("#collapse-button"),
+    toolbarProgress: document.querySelector("#toolbar-progress"),
+    toolbarProgressPercent: document.querySelector("#toolbar-progress-percent"),
+    toolbarProgressFill: document.querySelector("#toolbar-progress-fill"),
+    toolbarProgressCount: document.querySelector("#toolbar-progress-count"),
     resultsCount: document.querySelector("#results-count"),
     activeContext: document.querySelector("#active-context"),
     courseList: document.querySelector("#course-list"),
@@ -212,6 +216,10 @@ import {
       renderCourseList();
     });
 
+    elements.toolbarProgress.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
     elements.clearFiltersButton.addEventListener("click", clearFilters);
     elements.exportButton.addEventListener("click", exportProgress);
     elements.importButton.addEventListener("click", () => elements.importFile.click());
@@ -272,6 +280,13 @@ import {
     elements.progressPercent.textContent = displayPercent;
     elements.progressFill.style.width = `${percent}%`;
     elements.progressTrack.setAttribute("aria-valuenow", percent.toFixed(2));
+    elements.toolbarProgressPercent.textContent = displayPercent;
+    elements.toolbarProgressFill.style.width = `${percent}%`;
+    elements.toolbarProgressCount.textContent = `${completed} / ${total} 节`;
+    elements.toolbarProgress.setAttribute(
+      "aria-label",
+      `整体学习进度 ${displayPercent}，已完成 ${completed} 节，共 ${total} 节，点击返回顶部总览`,
+    );
     elements.completedCount.textContent = String(completed);
     elements.remainingCount.textContent = String(remaining);
     elements.totalCount.textContent = String(total);

@@ -163,6 +163,7 @@ button {
 .text-button,
 .reset-button,
 .collapse-button,
+.toolbar-progress,
 .empty-state button {
   border: 0;
   background: none;
@@ -557,7 +558,7 @@ h1 {
   z-index: 20;
   top: var(--header-height);
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) auto auto;
+  grid-template-columns: minmax(260px, 1fr) auto auto auto;
   gap: 18px;
   align-items: center;
   min-height: 82px;
@@ -637,6 +638,81 @@ kbd {
 .collapse-button:hover,
 .collapse-button:focus-visible {
   color: var(--text);
+}
+
+.toolbar-progress {
+  display: grid;
+  min-width: 154px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "label percent"
+    "track count";
+  gap: 4px 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: rgba(241, 243, 233, 0.025);
+  color: var(--muted);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.toolbar-progress:hover,
+.toolbar-progress:focus-visible {
+  border-color: rgba(201, 255, 69, 0.38);
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.toolbar-progress:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.toolbar-progress-label {
+  grid-area: label;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.toolbar-progress-percent {
+  grid-area: percent;
+  color: var(--accent);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 760;
+}
+
+.toolbar-progress-track {
+  position: relative;
+  grid-area: track;
+  display: block;
+  width: 84px;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(241, 243, 233, 0.13);
+}
+
+.toolbar-progress-fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(201, 255, 69, 0.38);
+  transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.toolbar-progress-count {
+  grid-area: count;
+  color: var(--muted);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .results-meta {
@@ -1290,6 +1366,18 @@ footer {
 
   .filter-tab {
     flex: 1;
+  }
+
+  .toolbar-progress {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-areas: "label percent track count";
+    gap: 0 10px;
+  }
+
+  .toolbar-progress-track {
+    width: auto;
   }
 
   .stage-section {
