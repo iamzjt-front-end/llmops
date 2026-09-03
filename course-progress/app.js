@@ -62,6 +62,10 @@ import {
   let syncTimer = null;
   let syncInFlight = false;
   let activeLocationFrame = 0;
+  // Keep scroll-driven highlighting from overwriting an explicit navigation target.
+  let pendingNavigation = null;
+  let navigationUnlockTimer = 0;
+  let navigationSequence = 0;
 
   const elements = {
     progressPercent: document.querySelector("#progress-percent"),
@@ -217,8 +221,13 @@ import {
     });
 
     elements.toolbarProgress.addEventListener("click", () => {
+      cancelPendingNavigation();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
+
+    window.addEventListener("scrollend", () => finishPendingNavigation());
+    window.addEventListener("wheel", cancelPendingNavigation, { passive: true });
+    window.addEventListener("touchstart", cancelPendingNavigation, { passive: true });
 
     elements.clearFiltersButton.addEventListener("click", clearFilters);
     elements.exportButton.addEventListener("click", exportProgress);
@@ -569,6 +578,7 @@ import {
       return;
     }
 
+    cancelPendingNavigation();
     state.filter = "todo";
     state.query = "";
     state.targetLessonId = nextLesson.id;
@@ -628,6 +638,7 @@ import {
     const stageLessons = stages.get(Number(stageOrder));
     if (!stageLessons?.length) return;
 
+    const navigationToken = beginPendingNavigation(`stage-${stageOrder}`);
     state.activeStageOrder = String(stageOrder);
     state.activeWeekKey = weekKeyFor(stageLessons[0]);
     state.expandedStages.add(String(stageOrder));
@@ -635,13 +646,14 @@ import {
     renderStageNavigation();
     renderCourseList();
     focusNavigationButton("data-stage-target", String(stageOrder));
-    scrollToElement(`stage-${stageOrder}`);
+    scrollToElement(`stage-${stageOrder}`, navigationToken);
   }
 
   function navigateToWeek(targetId, key, stageOrder) {
     const stageLessons = stages.get(Number(stageOrder));
     if (!stageLessons?.length || !key) return;
 
+    const navigationToken = beginPendingNavigation(targetId);
     state.activeStageOrder = String(stageOrder);
     state.activeWeekKey = key;
     state.expandedStages.add(String(stageOrder));
@@ -650,7 +662,7 @@ import {
     renderStageNavigation();
     renderCourseList();
     focusNavigationButton("data-week-key", key);
-    scrollToElement(targetId);
+    scrollToElement(targetId, navigationToken);
   }
 
   function resetFiltersForNavigation() {
@@ -664,9 +676,17 @@ import {
     });
   }
 
-  function scrollToElement(id) {
+  function scrollToElement(id, navigationToken) {
     window.requestAnimationFrame(() => {
-      document.getElementById(id)?.scrollIntoView({
+      if (pendingNavigation?.token !== navigationToken) return;
+
+      const target = document.getElementById(id);
+      if (!target) {
+        finishPendingNavigation(true, navigationToken);
+        return;
+      }
+
+      target.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
@@ -691,6 +711,17 @@ import {
   }
 
   function updateActiveLocationFromScroll() {
+    if (pendingNavigation) {
+      const target = document.getElementById(pendingNavigation.targetId);
+      if (!target) {
+        finishPendingNavigation(true);
+      } else if (!isPendingNavigationReached(target)) {
+        return;
+      } else {
+        finishPendingNavigation(true);
+      }
+    }
+
     const stageSections = [...document.querySelectorAll(".stage-section")];
     if (stageSections.length === 0) return;
 
@@ -706,6 +737,37 @@ import {
       .at(-1);
     const stageOrder = currentStage.id.replace("stage-", "");
     setActiveLocation(stageOrder, currentWeek?.dataset.weekKey || null);
+  }
+
+  function beginPendingNavigation(targetId) {
+    const token = navigationSequence + 1;
+    navigationSequence = token;
+    window.clearTimeout(navigationUnlockTimer);
+    pendingNavigation = { targetId, token };
+    navigationUnlockTimer = window.setTimeout(() => finishPendingNavigation(true, token), 3_000);
+    return token;
+  }
+
+  function finishPendingNavigation(force = false, token = null) {
+    if (!pendingNavigation) return;
+    if (token !== null && pendingNavigation.token !== token) return;
+
+    const target = document.getElementById(pendingNavigation.targetId);
+    if (!force && target && !isPendingNavigationReached(target)) return;
+
+    pendingNavigation = null;
+    window.clearTimeout(navigationUnlockTimer);
+    navigationUnlockTimer = 0;
+    scheduleActiveLocationUpdate();
+  }
+
+  function cancelPendingNavigation() {
+    finishPendingNavigation(true);
+  }
+
+  function isPendingNavigationReached(target) {
+    const expectedTop = Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+    return Math.abs(target.getBoundingClientRect().top - expectedTop) <= 8;
   }
 
   function setActiveLocation(stageOrder, weekKey) {
