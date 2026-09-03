@@ -1,9 +1,13 @@
 from dataclasses import dataclass
+from operator import itemgetter
 from uuid import UUID
 
 from injector import inject
+from langchain_classic.memory import ConversationBufferWindowMemory
+from langchain_community.chat_message_histories import FileChatMessageHistory
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_deepseek import ChatDeepSeek
 
 from internal.exception import FailException
@@ -43,16 +47,45 @@ class AppHandler:
     if not req.validate():
       return validate_error_json(req.errors)
 
-    # 2.构建组件
-    prompt = ChatPromptTemplate.from_template('{query}')
+    # 2.创建prompt与记忆
+    prompt = ChatPromptTemplate.from_messages(
+      [
+        ('system', '你是一个强大的聊天机器人，请根据用户的提问回复对应的问题。'),
+        MessagesPlaceholder('history'),
+        ('human', '{query}'),
+      ]
+    )
+    memory = ConversationBufferWindowMemory(
+      k=3,
+      input_key='query',
+      output_key='output',
+      return_messages=True,
+      chat_memory=FileChatMessageHistory('./storage/memory/chat_history.txt'),
+    )
+
+    # 3.创建llm
     llm = ChatDeepSeek(model='deepseek-v4-flash')
-    parser = StrOutputParser()
 
-    # 3.构建链
-    chain = prompt | llm | parser
+    # 4.构建链
+    chain = (
+      RunnablePassthrough.assign(
+        history=RunnableLambda(memory.load_memory_variables) | itemgetter('history')
+      )
+      | prompt
+      | llm
+      | StrOutputParser()
+    )
 
-    # 4.调用链得到结果
-    content = chain.invoke({'query': req.query.data})
+    # 5.调用链得到结果
+    chain_input = {'query': req.query.data}
+    content = chain.invoke(chain_input)
+
+    memory.save_context(
+      chain_input,
+      {
+        'output': content,
+      },
+    )
 
     return success_json({'content': content})
 

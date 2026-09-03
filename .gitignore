@@ -7,6 +7,9 @@
 # 示例脚本运行时生成的对话历史
 llmops-api/study/**/chat_history*.txt
 
+# 应用运行时生成的本地存储
+llmops-api/storage/
+
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
