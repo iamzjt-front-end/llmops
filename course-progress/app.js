@@ -32,6 +32,9 @@ import {
   const stages = groupBy(lessons, (lesson) => lesson.stageOrder);
   const weekKeyFor = (lesson) => `${lesson.stageOrder}:${lesson.weekUnit}`;
   const weekGroups = groupBy(lessons, weekKeyFor);
+  const courseWeekCount = new Set(
+    lessons.map((lesson) => lesson.week.replace(/(上|下)$/, "")),
+  ).size;
   const chapterKeyFor = (lesson) => `${weekKeyFor(lesson)}:${lesson.chapter}`;
   const chapterGroups = groupBy(lessons, chapterKeyFor);
   const syncEndpoint = normalizeEndpoint(
@@ -44,7 +47,10 @@ import {
     updatedAt: initialLocal.state.updatedAt,
     filter: "all",
     query: "",
+    expandedStages: new Set(),
     expandedWeeks: new Set(),
+    activeStageOrder: null,
+    activeWeekKey: null,
     targetLessonId: null,
   };
 
@@ -55,6 +61,7 @@ import {
   let syncClient = syncSecret ? createProgressClient({ endpoint: syncEndpoint, secret: syncSecret }) : null;
   let syncTimer = null;
   let syncInFlight = false;
+  let activeLocationFrame = 0;
 
   const elements = {
     progressPercent: document.querySelector("#progress-percent"),
@@ -66,6 +73,7 @@ import {
     totalCount: document.querySelector("#total-count"),
     continueButton: document.querySelector("#continue-button"),
     stageNavigation: document.querySelector("#stage-navigation"),
+    stageSummary: document.querySelector("#stage-summary"),
     searchInput: document.querySelector("#search-input"),
     filterTabs: [...document.querySelectorAll(".filter-tab")],
     collapseButton: document.querySelector("#collapse-button"),
@@ -93,7 +101,17 @@ import {
 
   const firstIncomplete = getFirstIncomplete();
   if (firstIncomplete) {
+    state.activeStageOrder = String(firstIncomplete.stageOrder);
+    state.activeWeekKey = weekKeyFor(firstIncomplete);
+    state.expandedStages.add(String(firstIncomplete.stageOrder));
     state.expandedWeeks.add(weekKeyFor(firstIncomplete));
+  } else {
+    const firstStage = [...stages.keys()].sort((a, b) => Number(a) - Number(b))[0];
+    if (firstStage !== undefined) {
+      state.activeStageOrder = String(firstStage);
+      state.expandedStages.add(String(firstStage));
+      state.activeWeekKey = weekKeyFor(stages.get(firstStage)[0]);
+    }
   }
 
   bindEvents();
@@ -136,14 +154,37 @@ import {
     });
 
     elements.stageNavigation.addEventListener("click", (event) => {
-      const link = event.target.closest("[data-stage-target]");
-      if (!link) return;
+      const stageToggle = event.target.closest("[data-stage-toggle]");
+      if (stageToggle) {
+        const stageKey = stageToggle.dataset.stageToggle;
+        if (state.expandedStages.has(stageKey)) {
+          state.expandedStages.delete(stageKey);
+        } else {
+          state.expandedStages.add(stageKey);
+        }
+        renderStageNavigation();
+        focusNavigationButton("data-stage-toggle", stageKey);
+        return;
+      }
 
-      document.querySelector(`#stage-${link.dataset.stageTarget}`)?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      const weekLink = event.target.closest("[data-week-target]");
+      if (weekLink) {
+        navigateToWeek(
+          weekLink.dataset.weekTarget,
+          weekLink.dataset.weekKey,
+          weekLink.dataset.stageOrder,
+        );
+        return;
+      }
+
+      const stageLink = event.target.closest("[data-stage-target]");
+      if (!stageLink) return;
+
+      navigateToStage(stageLink.dataset.stageTarget);
     });
+
+    window.addEventListener("scroll", scheduleActiveLocationUpdate, { passive: true });
+    window.addEventListener("resize", scheduleActiveLocationUpdate);
 
     elements.searchInput.addEventListener("input", (event) => {
       state.query = event.target.value.trim().toLocaleLowerCase("zh-CN");
@@ -248,20 +289,75 @@ import {
   }
 
   function renderStageNavigation() {
-    elements.stageNavigation.innerHTML = [...stages.entries()]
-      .sort(([a], [b]) => Number(a) - Number(b))
-      .map(([stageOrder, stageLessons]) => {
+    const orderedStages = [...stages.entries()]
+      .sort(([a], [b]) => Number(a) - Number(b));
+    elements.stageSummary.textContent = `${stages.size} 阶段 · ${courseWeekCount} 周`;
+    elements.stageNavigation.innerHTML = orderedStages.map(([stageOrder, stageLessons]) => {
         const completeCount = stageLessons.filter((lesson) => state.completed.has(lesson.id)).length;
         const percent = (completeCount / stageLessons.length) * 100;
+        const stageKey = String(stageOrder);
+        const weeks = [...groupBy(stageLessons, weekKeyFor).entries()];
+        const isExpanded = state.expandedStages.has(stageKey);
+        const isActive = state.activeStageOrder === stageKey;
+        const weekListId = `stage-weeks-${stageKey}`;
         return `
-          <button class="stage-link" type="button" data-stage-target="${stageOrder}">
-            <span class="stage-link-index">${String(stageOrder).padStart(2, "0")}</span>
-            <span class="stage-link-title">${escapeHtml(stageLessons[0].stageName)}</span>
-            <span class="stage-link-progress">${formatPercent(percent)}</span>
-          </button>
+          <div class="stage-nav-group ${isExpanded ? "is-expanded" : ""}">
+            <div class="stage-nav-row">
+              <button
+                class="stage-link ${isActive ? "is-active" : ""}"
+                type="button"
+                data-stage-target="${stageKey}"
+                aria-label="定位到阶段${stageOrder}：${escapeAttribute(stageLessons[0].stageName)}，${weeks.length}周课程"
+                ${isActive ? 'aria-current="location"' : ""}
+              >
+                <span class="stage-link-index">${String(stageOrder).padStart(2, "0")}</span>
+                <span class="stage-link-title" title="${escapeAttribute(stageLessons[0].stageName)}">${escapeHtml(stageLessons[0].stageName)}</span>
+                <span class="stage-link-progress">${formatPercent(percent)}</span>
+              </button>
+              <button
+                class="stage-toggle"
+                type="button"
+                data-stage-toggle="${stageKey}"
+                aria-controls="${weekListId}"
+                aria-expanded="${isExpanded}"
+                aria-label="${isExpanded ? "收起" : "展开"}阶段${stageOrder}的周次"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+              </button>
+            </div>
+            <div class="stage-week-list ${isExpanded ? "is-open" : ""}" id="${weekListId}" aria-hidden="${!isExpanded}" ${isExpanded ? "" : "inert"}>
+              <div class="stage-week-list-inner">
+                ${weeks.map(([, weekLessons]) => renderStageWeek(weekLessons, stageOrder)).join("")}
+              </div>
+            </div>
+          </div>
         `;
       })
       .join("");
+  }
+
+  function renderStageWeek(weekLessons, stageOrder) {
+    const firstLesson = weekLessons[0];
+    const key = weekKeyFor(firstLesson);
+    const completed = weekLessons.filter((lesson) => state.completed.has(lesson.id)).length;
+    const isActive = state.activeWeekKey === key;
+    const topic = getWeekTopic(firstLesson.weekUnit);
+    return `
+      <button
+        class="stage-week-link ${isActive ? "is-active" : ""}"
+        type="button"
+        data-week-target="${escapeAttribute(weekDomIdFor(firstLesson))}"
+        data-week-key="${escapeAttribute(key)}"
+        data-stage-order="${escapeAttribute(String(stageOrder))}"
+        title="${escapeAttribute(`${firstLesson.week} · ${topic}`)}"
+        aria-label="定位到${escapeAttribute(firstLesson.week)}：${escapeAttribute(topic)}，已完成 ${completed} 节，共 ${weekLessons.length} 节"
+        ${isActive ? 'aria-current="location"' : ""}
+      >
+        <span class="stage-week-number">${escapeHtml(firstLesson.week)}</span>
+        <span class="stage-week-topic">${escapeHtml(topic)}</span>
+        <span class="stage-week-count">${completed}/${weekLessons.length}</span>
+      </button>
+    `;
   }
 
   function renderCourseList() {
@@ -291,6 +387,7 @@ import {
         return renderStage(Number(stageOrder), stageLessons, stageVisible);
       })
       .join("");
+    scheduleActiveLocationUpdate();
   }
 
   function renderStage(stageOrder, allStageLessons, visibleStageLessons) {
@@ -326,7 +423,7 @@ import {
     const chapters = groupBy(weekLessons, (lesson) => lesson.chapter);
 
     return `
-      <article class="week-group">
+      <article class="week-group" id="${escapeAttribute(weekDomIdFor(weekLessons[0]))}" data-week-key="${escapeAttribute(key)}">
         <button
           class="week-toggle"
           type="button"
@@ -334,7 +431,7 @@ import {
           aria-expanded="${isOpen}"
         >
           <span class="week-label">${escapeHtml(allWeekLessons[0].week)}</span>
-          <span class="week-title">${escapeHtml(weekUnit.replace(/^第\s*\d+\s*周\s*(上|下)?\s*/, ""))}</span>
+          <span class="week-title">${escapeHtml(getWeekTopic(weekUnit))}</span>
           <span class="week-meta">${completed} / ${allWeekLessons.length}</span>
           <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
         </button>
@@ -460,11 +557,15 @@ import {
     state.filter = "todo";
     state.query = "";
     state.targetLessonId = nextLesson.id;
+    state.activeStageOrder = String(nextLesson.stageOrder);
+    state.activeWeekKey = weekKeyFor(nextLesson);
+    state.expandedStages.add(String(nextLesson.stageOrder));
     state.expandedWeeks.add(weekKeyFor(nextLesson));
     elements.searchInput.value = "";
     elements.filterTabs.forEach((tab) => {
       tab.classList.toggle("is-active", tab.dataset.filter === "todo");
     });
+    renderStageNavigation();
     renderCourseList();
 
     window.requestAnimationFrame(() => {
@@ -508,8 +609,120 @@ import {
     renderCourseList();
   }
 
+  function navigateToStage(stageOrder) {
+    const stageLessons = stages.get(Number(stageOrder));
+    if (!stageLessons?.length) return;
+
+    state.activeStageOrder = String(stageOrder);
+    state.activeWeekKey = weekKeyFor(stageLessons[0]);
+    state.expandedStages.add(String(stageOrder));
+    resetFiltersForNavigation();
+    renderStageNavigation();
+    renderCourseList();
+    focusNavigationButton("data-stage-target", String(stageOrder));
+    scrollToElement(`stage-${stageOrder}`);
+  }
+
+  function navigateToWeek(targetId, key, stageOrder) {
+    const stageLessons = stages.get(Number(stageOrder));
+    if (!stageLessons?.length || !key) return;
+
+    state.activeStageOrder = String(stageOrder);
+    state.activeWeekKey = key;
+    state.expandedStages.add(String(stageOrder));
+    state.expandedWeeks.add(key);
+    resetFiltersForNavigation();
+    renderStageNavigation();
+    renderCourseList();
+    focusNavigationButton("data-week-key", key);
+    scrollToElement(targetId);
+  }
+
+  function resetFiltersForNavigation() {
+    if (state.filter === "all" && !state.query) return;
+
+    state.filter = "all";
+    state.query = "";
+    elements.searchInput.value = "";
+    elements.filterTabs.forEach((tab) => {
+      tab.classList.toggle("is-active", tab.dataset.filter === "all");
+    });
+  }
+
+  function scrollToElement(id) {
+    window.requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+
+  function focusNavigationButton(attribute, value) {
+    window.requestAnimationFrame(() => {
+      const button = [...elements.stageNavigation.querySelectorAll(`[${attribute}]`)]
+        .find((candidate) => candidate.getAttribute(attribute) === value);
+      button?.focus({ preventScroll: true });
+    });
+  }
+
+  function scheduleActiveLocationUpdate() {
+    if (activeLocationFrame) return;
+
+    activeLocationFrame = window.requestAnimationFrame(() => {
+      activeLocationFrame = 0;
+      updateActiveLocationFromScroll();
+    });
+  }
+
+  function updateActiveLocationFromScroll() {
+    const stageSections = [...document.querySelectorAll(".stage-section")];
+    if (stageSections.length === 0) return;
+
+    const toolbarBottom = document.querySelector(".toolbar")?.getBoundingClientRect().bottom || 0;
+    const marker = toolbarBottom + 20;
+    let currentStage = stageSections[0];
+    stageSections.forEach((section) => {
+      if (section.getBoundingClientRect().top <= marker) currentStage = section;
+    });
+
+    const currentWeek = [...currentStage.querySelectorAll(".week-group")]
+      .filter((week) => week.getBoundingClientRect().top <= marker)
+      .at(-1);
+    const stageOrder = currentStage.id.replace("stage-", "");
+    setActiveLocation(stageOrder, currentWeek?.dataset.weekKey || null);
+  }
+
+  function setActiveLocation(stageOrder, weekKey) {
+    const stageKey = String(stageOrder);
+    if (state.activeStageOrder === stageKey && state.activeWeekKey === weekKey) return;
+
+    state.activeStageOrder = stageKey;
+    state.activeWeekKey = weekKey;
+    elements.stageNavigation.querySelectorAll("[data-stage-target]").forEach((button) => {
+      const isActive = button.dataset.stageTarget === stageKey;
+      button.classList.toggle("is-active", isActive);
+      if (isActive) button.setAttribute("aria-current", "location");
+      else button.removeAttribute("aria-current");
+    });
+    elements.stageNavigation.querySelectorAll("[data-week-target]").forEach((button) => {
+      const isActive = button.dataset.weekKey === weekKey;
+      button.classList.toggle("is-active", isActive);
+      if (isActive) button.setAttribute("aria-current", "location");
+      else button.removeAttribute("aria-current");
+    });
+  }
+
   function getFirstIncomplete() {
     return lessons.find((lesson) => !state.completed.has(lesson.id));
+  }
+
+  function getWeekTopic(weekUnit) {
+    return weekUnit.replace(/^第\s*\d+\s*周\s*(上|下)?\s*/, "");
+  }
+
+  function weekDomIdFor(lesson) {
+    return `week-${encodeURIComponent(weekKeyFor(lesson))}`;
   }
 
   function persistCompleted(updatedAt = new Date().toISOString(), markChanged = true) {
