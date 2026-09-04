@@ -6,7 +6,7 @@ from langchain_community.chat_models.baidu_qianfan_endpoint import QianfanChatEn
 
 dotenv.load_dotenv()
 
-# llm = ChatOpenAI(model="gpt-4o", temperature=0)
+# llm = ChatDeepSeek(model="gpt-4o", temperature=0)
 llm = QianfanChatEndpoint()
 
 chain = ConversationChain(
