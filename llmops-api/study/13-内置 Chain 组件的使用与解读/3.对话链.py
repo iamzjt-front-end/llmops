@@ -8,7 +8,7 @@ llm = ChatDeepSeek(model='deepseek-v4-flash')
 chain = ConversationChain(llm=llm)
 
 content = chain.invoke(
-  {'input': '你好，我是慕小课，我喜欢打篮球还有游泳，你喜欢什么运动呢？'}
+  {'input': '你好，我是zjt，我喜欢打篮球还有游泳，你喜欢什么运动呢？'}
 )
 
 print(content)

@@ -9,7 +9,7 @@ memory = BaseChatMemory(
 
 memory.load_memory_variables({})
 
-# content = chain.invoke({"query": "你好，我是慕小课你是谁", "chat_history": memory_variable.get("chat_history")})
-# memory.save_context({"query": "你好，我是慕小课你是谁"}, {"output": "你好，我是ChatGPT,有什么可以帮到您的"})
+# content = chain.invoke({"query": "你好，我是zjt你是谁", "chat_history": memory_variable.get("chat_history")})
+# memory.save_context({"query": "你好，我是zjt你是谁"}, {"output": "你好，我是ChatGPT,有什么可以帮到您的"})
 memory_variable = memory.load_memory_variables({})
-# content = chain.invoke({"query": "你好，我是慕小课你是谁", "chat_history": memory_variable.get("chat_history")})
+# content = chain.invoke({"query": "你好，我是zjt你是谁", "chat_history": memory_variable.get("chat_history")})

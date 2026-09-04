@@ -15,7 +15,7 @@ chain = ConversationChain(
   memory=ConversationEntityMemory(llm=llm),
 )
 
-print(chain.invoke({'input': '你好，我是慕小课。我最近正在学习LangChain。'}))
+print(chain.invoke({'input': '你好，我是zjt。我最近正在学习LangChain。'}))
 print(chain.invoke({'input': '我最喜欢的编程语言是 Python。'}))
 print(chain.invoke({'input': '我住在广州'}))
 

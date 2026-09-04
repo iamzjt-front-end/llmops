@@ -34,4 +34,4 @@ runnable = RunnableLambda(lambda x: time.sleep(x)).with_listeners(
 chain = runnable
 
 # 2.调用并执行链
-chain.invoke(2, config={"configurable": {"name": "慕小课"}})
+chain.invoke(2, config={"configurable": {"name": "zjt"}})
