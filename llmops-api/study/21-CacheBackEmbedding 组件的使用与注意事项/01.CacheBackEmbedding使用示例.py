@@ -29,9 +29,9 @@ embeddings_with_cache = CacheBackedEmbeddings.from_bytes_store(
   query_embedding_cache=True,
 )
 
-query_vector = embeddings_with_cache.embed_query('你好，我是慕小课，我喜欢打篮球')
+query_vector = embeddings_with_cache.embed_query('你好，我是zjt，我喜欢打篮球')
 documents_vector = embeddings_with_cache.embed_documents(
-  ['你好，我是慕小课，我喜欢打篮球', '这个喜欢打篮球的人叫慕小课', '求知若渴，虚心若愚']
+  ['你好，我是zjt，我喜欢打篮球', '这个喜欢打篮球的人叫zjt', '求知若渴，虚心若愚']
 )
 
 print(query_vector)

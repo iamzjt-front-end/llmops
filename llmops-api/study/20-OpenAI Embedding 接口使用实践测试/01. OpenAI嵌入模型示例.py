@@ -23,14 +23,14 @@ def cosine_similarity(vec1: list, vec2: list) -> float:
 embeddings = OpenAIEmbeddings(model='text-embedding-3-small')
 
 # 2.嵌入文本
-query_vector = embeddings.embed_query('我叫慕小课，我喜欢打篮球')
+query_vector = embeddings.embed_query('我叫zjt，我喜欢打篮球')
 
 print(query_vector)
 print(len(query_vector))
 
 # 3.嵌入文档列表/字符串列表
 documents_vector = embeddings.embed_documents(
-  ['我叫慕小课，我喜欢打篮球', '这个喜欢打篮球的人叫慕小课', '求知若渴，虚心若愚']
+  ['我叫zjt，我喜欢打篮球', '这个喜欢打篮球的人叫zjt', '求知若渴，虚心若愚']
 )
 print(len(documents_vector))
 
