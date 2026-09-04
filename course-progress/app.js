@@ -284,7 +284,7 @@ import {
     const total = lessons.length;
     const remaining = total - completed;
     const percent = total === 0 ? 0 : (completed / total) * 100;
-    const displayPercent = formatPercent(percent);
+    const displayPercent = formatOverallPercent(percent);
 
     elements.progressPercent.textContent = displayPercent;
     elements.progressFill.style.width = `${percent}%`;
@@ -1071,6 +1071,10 @@ import {
     if (value > 0 && value < 1) return "<1%";
     if (value >= 99 && value < 100) return "99%";
     return `${Math.round(value)}%`;
+  }
+
+  function formatOverallPercent(value) {
+    return `${value.toFixed(2)}%`;
   }
 
   function escapeHtml(value) {
