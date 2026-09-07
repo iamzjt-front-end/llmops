@@ -7,6 +7,11 @@
 # 示例脚本运行时生成的对话历史
 llmops-api/study/**/chat_history*.txt
 
+# 示例脚本运行时生成的嵌入缓存、模型缓存与向量库
+llmops-api/study/**/cache/
+llmops-api/study/**/embeddings/
+llmops-api/study/**/vector-store/
+
 # 应用运行时生成的本地存储
 llmops-api/storage/
 
