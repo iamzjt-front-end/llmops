@@ -1,5 +1,6 @@
 import uuid
-from typing import Any, Iterable, List, Optional, Type
+from collections.abc import Iterable
+from typing import Any
 
 import dotenv
 import numpy as np
@@ -11,12 +12,12 @@ from langchain_openai import OpenAIEmbeddings
 
 class MemoryVectorStore(VectorStore):
     """基于内存+欧几里得距离的向量数据库"""
-    store: dict = {}  # 存储向量的临时变量
 
     def __init__(self, embedding: Embeddings):
         self._embedding = embedding
+        self.store = {}  # 存储向量的临时变量
 
-    def add_texts(self, texts: Iterable[str], metadatas: Optional[List[dict]] = None, **kwargs: Any) -> List[str]:
+    def add_texts(self, texts: Iterable[str], metadatas: list[dict] | None = None, **kwargs: Any) -> list[str]:
         """将数据添加到向量数据库中"""
         # 1.检测metadata的数据格式
         if metadatas is not None and len(metadatas) != len(texts):
@@ -37,14 +38,14 @@ class MemoryVectorStore(VectorStore):
 
         return ids
 
-    def similarity_search(self, query: str, k: int = 4, **kwargs: Any) -> List[Document]:
+    def similarity_search(self, query: str, k: int = 4, **kwargs: Any) -> list[Document]:
         """传入对应的query执行相似性搜索"""
         # 1.将query转换成向量
         embedding = self._embedding.embed_query(query)
 
         # 2.循环和store中的每一个向量进行比较，计算欧几里得距离
         result = []
-        for key, record in self.store.items():
+        for record in self.store.values():
             distance = self._euclidean_distance(embedding, record["vector"])
             result.append({"distance": distance, **record})
 
@@ -60,8 +61,8 @@ class MemoryVectorStore(VectorStore):
         ]
 
     @classmethod
-    def from_texts(cls: Type["MemoryVectorStore"], texts: List[str], embedding: Embeddings,
-                   metadatas: Optional[List[dict]] = None,
+    def from_texts(cls: type["MemoryVectorStore"], texts: list[str], embedding: Embeddings,
+                   metadatas: list[dict] | None = None,
                    **kwargs: Any) -> "MemoryVectorStore":
         """从文本和元数据中去构建向量数据库"""
         memory_vector_store = cls(embedding=embedding)
