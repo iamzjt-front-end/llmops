@@ -1,7 +1,9 @@
+import os
+
 import dotenv
 import numpy as np
-from langchain.embeddings import CacheBackedEmbeddings
-from langchain.storage import LocalFileStore
+from langchain_classic.embeddings import CacheBackedEmbeddings
+from langchain_classic.storage import LocalFileStore
 from langchain_openai import OpenAIEmbeddings
 from numpy.linalg import norm
 
@@ -21,7 +23,11 @@ def cosine_similarity(vector1: list, vector2: list) -> float:
   return dot_product / (norm_vec1 * norm_vec2)
 
 
-embeddings = OpenAIEmbeddings(model='text-embedding-3-small')
+embeddings = OpenAIEmbeddings(
+  model='embedding-3',
+  api_key=os.getenv('GLM_API_KEY'),
+  base_url=os.getenv('GLM_API_BASE'),
+)
 embeddings_with_cache = CacheBackedEmbeddings.from_bytes_store(
   embeddings,
   LocalFileStore('./cache/'),
