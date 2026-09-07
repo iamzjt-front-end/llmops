@@ -18,7 +18,6 @@ class CustomException(Exception):
 class FailException(CustomException):
   """通用失败异常"""
 
-  pass
 
 
 class NotFoundException(CustomException):
