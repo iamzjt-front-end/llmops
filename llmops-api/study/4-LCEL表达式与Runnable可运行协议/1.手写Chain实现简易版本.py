@@ -15,8 +15,6 @@ parser = StrOutputParser()
 
 # 2.定义链
 class Chain:
-  steps: list = []
-
   def __init__(self, steps: list):
     self.steps = steps
 

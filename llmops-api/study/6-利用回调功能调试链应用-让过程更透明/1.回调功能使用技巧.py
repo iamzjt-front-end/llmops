@@ -4,9 +4,9 @@ from uuid import UUID
 
 import dotenv
 from langchain_core.callbacks import BaseCallbackHandler, StdOutCallbackHandler
-from langchain_core.messages import BaseMessage, ChatMessage
+from langchain_core.messages import BaseMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.outputs import ChatGenerationChunk, GenerationChunk, LLMResult
+from langchain_core.outputs import LLMResult
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_deepseek import ChatDeepSeek
