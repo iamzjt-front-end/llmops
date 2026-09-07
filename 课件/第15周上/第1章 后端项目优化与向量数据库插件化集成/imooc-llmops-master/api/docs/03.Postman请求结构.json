@@ -1,0 +1,2989 @@
+{
+	"info": {
+		"_postman_id": "34e3d151-f22b-421d-b94a-4da6ffea92c0",
+		"name": "LLMOps-api项目",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33493045"
+	},
+	"item": [
+		{
+			"name": "AI应用模块",
+			"item": [
+				{
+					"name": "获取应用分页列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps"
+							],
+							"query": [
+								{
+									"key": "search_word",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "删除指定的应用",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "c3f3256c-7315-4f4a-832c-7e0dc46b1dec"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "修改应用基础信息 API 接口",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"测试修改\",\r\n    \"icon\": \"https://imooc-llmops-1304251364.cos.ap-guangzhou.myqcloud.com/2024/11/13/6461f5f5-6e43-450a-a3fe-8f574542d7d9.jpg\",\r\n    \"description\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "创建应用副本 API 接口",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/copy",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"copy"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "在个人空间下新增应用",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"icon\": \"https://imooc-llmops-1304251364.cos.ap-guangzhou.myqcloud.com/2024/11/13/6461f5f5-6e43-450a-a3fe-8f574542d7d9.jpg\",\r\n    \"name\": \"测试Agent应用\",\r\n    \"description\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/apps",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取应用基础信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取特定应用的草稿配置信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/draft-app-config",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"draft-app-config"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "更新应用草稿配置信息",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"model_config\": {\r\n        \"provider\": \"openai\",\r\n        \"model\": \"gpt-4o-mini\",\r\n        \"parameters\": {\r\n            \"temperature\": 0.5,\r\n            \"top_p\": 0.85,\r\n            \"frequency_penalty\": 0.2,\r\n            \"presence_penalty\": 0.2,\r\n            \"max_tokens\": 8192\r\n        }\r\n    },\r\n    \"dialog_round\": 3,\r\n    \"preset_prompt\": \"这是一段预设Prompt\",\r\n    \"tools\": [\r\n        {\"type\": \"builtin_tool\", \"params\": {}, \"tool_id\": \"google_serper\", \"provider_id\": \"google\"},\r\n        {\"type\": \"builtin_tool\", \"params\": {\"size\": \"1792x1024\", \"style\": \"vivid\"}, \"tool_id\": \"dalle3\", \"provider_id\": \"dalle\"},\r\n        {\"type\": \"builtin_tool\", \"params\": {}, \"tool_id\": \"gaode_weather\", \"provider_id\": \"gaode\"},\r\n        {\"type\": \"api_tool\", \"params\": {}, \"tool_id\": \"YoudaoSuggest\", \"provider_id\": \"ddd09b76-fd10-4c4a-9d1a-e5765c759ff2\"}\r\n    ],\r\n    \"workflows\": [\"673ac69a-e6de-4c1a-8e83-ca64ccc13b75\"],\r\n    \"datasets\": [\"798f5324-c82e-44c2-94aa-035afbe88839\"],\r\n    \"retrieval_config\": {\r\n        \"retrieval_strategy\": \"semantic\",\r\n        \"k\": 10,\r\n        \"score\": 0.5\r\n    },\r\n    \"long_term_memory\": {\r\n        \"enable\": true\r\n    },\r\n    \"opening_statement\": \"\",\r\n    \"opening_questions\": [\"你知道什么是LLM吗？\", \"你知道什么是Agent吗？\"],\r\n    \"speech_to_text\": {\r\n        \"enable\": false\r\n    },\r\n    \"text_to_speech\": {\r\n        \"enable\": false,\r\n        \"voice\": \"echo\",\r\n        \"auto_play\": false\r\n    },\r\n    \"review_config\": {\r\n        \"enable\": false,\r\n        \"keywords\": [\"测试\", \"python\"],\r\n        \"inputs_config\": {\r\n            \"enable\": true,\r\n            \"preset_response\": \"你的输入不合法\"\r\n        },\r\n        \"outputs_config\": {\r\n            \"enable\": true\r\n        }\r\n    }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/draft-app-config",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"draft-app-config"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "发布/更新应用发布信息",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/publish",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"publish"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取消指定应用的发布",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/cancel-publish",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"cancel-publish"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取应用的发布历史列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/publish-histories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"publish-histories"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "回退指定的历史配置到草稿",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"app_config_version_id\": \"3705c2c5-f903-44cf-83b6-163a4d85284d\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/fallback-history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"fallback-history"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取应用调试长记忆",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"summary"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "更新应用调试长记忆",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"summary\": \"人类介绍自己叫慕小课，喜欢打篮球。\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"summary"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "清空应用的调试会话记录",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/conversations/delete-debug-conversation",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"conversations",
+								"delete-debug-conversation"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "应用调试对话",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"query\": \"请帮我调用wf_llmops_workflow()工具，查询llmops\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/conversations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"conversations"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "停止应用调试会话",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/conversations/tasks/:task_id/stop",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"conversations",
+								"tasks",
+								":task_id",
+								"stop"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								},
+								{
+									"key": "task_id",
+									"value": "27a2e38a-8b65-4c81-8899-0e2386e62abb"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取应用的调试会话消息列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/conversations/messages",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"conversations",
+								"messages"
+							],
+							"query": [
+								{
+									"key": "created_at",
+									"value": "1731999434",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定应用的发布配置信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/published-config",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"published-config"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "重新生成 WebApp 的凭证标识",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/apps/:app_id/published-config/regenerate-web-app-token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"apps",
+								":app_id",
+								"published-config",
+								"regenerate-web-app-token"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "内置工具模块",
+			"item": [
+				{
+					"name": "获取所有内置工具信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/builtin-tools",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"builtin-tools"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定工具信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/builtin-tools/:provider/tools/:tool",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"builtin-tools",
+								":provider",
+								"tools",
+								":tool"
+							],
+							"variable": [
+								{
+									"key": "provider",
+									"value": "dalle"
+								},
+								{
+									"key": "tool",
+									"value": "dalle3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取分类信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/builtin-tools/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"builtin-tools",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取提供者对应的图标",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/builtin-tools/:provider_name/icon",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"builtin-tools",
+								":provider_name",
+								"icon"
+							],
+							"variable": [
+								{
+									"key": "provider_name",
+									"value": "google"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "自定义API工具模块",
+			"item": [
+				{
+					"name": "校验OpenAPI-Schema数据",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "openapi_schema",
+									"value": "{\"description\":\"这是一个查询对应英文单词字典的工具\",\"server\":\"https://dict.youdao.com\",\"paths\":{\"/suggest\":{\"get\":{\"description\":\"根据传递的单词查询其字典信息\",\"operationId\":\"YoudaoSuggest\",\"parameters\":[{\"name\":\"q\",\"in\":\"query\",\"description\":\"要检索查询的单词，例如love/computer\",\"required\":true,\"type\":\"str\"},{\"name\":\"doctype\",\"in\":\"query\",\"description\":\"返回的数据类型，支持json和xml两种格式，默认情况下json数据\",\"required\":false,\"type\":\"str\"}]}}}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api-tools/validate-openapi-schema",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-tools",
+								"validate-openapi-schema"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "创建自定义API工具提供者",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"有道单词测试\",\r\n    \"icon\": \"https://cdn.imooc.com/icon.png\",\r\n    \"openapi_schema\": \"{\\\"description\\\":\\\"这是一个查询对应英文单词字典的工具\\\",\\\"server\\\":\\\"https://dict.youdao.com\\\",\\\"paths\\\":{\\\"/suggest\\\":{\\\"get\\\":{\\\"description\\\":\\\"根据传递的单词查询其字典信息\\\",\\\"operationId\\\":\\\"YoudaoSuggest\\\",\\\"parameters\\\":[{\\\"name\\\":\\\"q\\\",\\\"in\\\":\\\"query\\\",\\\"description\\\":\\\"要检索查询的单词，例如love/computer\\\",\\\"required\\\":true,\\\"type\\\":\\\"str\\\"},{\\\"name\\\":\\\"doctype\\\",\\\"in\\\":\\\"query\\\",\\\"description\\\":\\\"返回的数据类型，支持json和xml两种格式，默认情况下json数据\\\",\\\"required\\\":false,\\\"type\\\":\\\"str\\\"}]}}}}\",\r\n    \"headers\": []\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api-tools",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-tools"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "删除API工具提供者",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api-tools/:provider_id/delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-tools",
+								":provider_id",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "provider_id",
+									"value": "d5b63ff1-e440-4ce8-9461-8d64fd98f5b1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "更新API工具提供者信息",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"谷歌搜索工具包123\",\r\n    \"icon\": \"https://cdn.imooc.com/icon.png\",\r\n    \"openapi_schema\": \"{\\\"description\\\":\\\"查询ip所在地、天气预报、路线规划等高德工具包\\\",\\\"server\\\":\\\"https://gaode.example.com\\\",\\\"paths\\\":{\\\"/weather\\\":{\\\"get\\\":{\\\"description\\\":\\\"根据传递的城市名获取指定城市的天气预报，例如：广州\\\",\\\"operationId\\\":\\\"GetCurrentWeather\\\",\\\"parameters\\\":[{\\\"name\\\":\\\"location\\\",\\\"in\\\":\\\"query\\\",\\\"description\\\":\\\"需要查询天气预报的城市名\\\",\\\"required\\\":true,\\\"type\\\":\\\"str\\\"}]}},\\\"/ip\\\":{\\\"post\\\":{\\\"description\\\":\\\"根据传递的ip查询ip归属地\\\",\\\"operationId\\\":\\\"GetLocationForIp\\\",\\\"parameters\\\":[{\\\"name\\\":\\\"ip\\\",\\\"in\\\":\\\"request_body\\\",\\\"description\\\":\\\"需要查询所在地的标准ip地址，例如:201.52.14.23\\\",\\\"required\\\":true,\\\"type\\\":\\\"str\\\"}]}}}}\",\r\n    \"headers\": [{\"key\": \"Authorization\", \"value\": \"Bearer access_token\"}]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api-tools/:provider_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-tools",
+								":provider_id"
+							],
+							"variable": [
+								{
+									"key": "provider_id",
+									"value": "b1ffd31f-5cbb-4b35-bc8f-4bafabd78817"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定API工具提供者信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api-tools/:provider_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-tools",
+								":provider_id"
+							],
+							"variable": [
+								{
+									"key": "provider_id",
+									"value": "ddd09b76-fd10-4c4a-9d1a-e5765c759ff2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取API工具提供者列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api-tools",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-tools"
+							],
+							"query": [
+								{
+									"key": "current_page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "page_size",
+									"value": "20",
+									"disabled": true
+								},
+								{
+									"key": "search_word",
+									"value": "高德",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定API工具详情",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api-tools/:provider_id/tools/:tool_name",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-tools",
+								":provider_id",
+								"tools",
+								":tool_name"
+							],
+							"variable": [
+								{
+									"key": "provider_id",
+									"value": "ddd09b76-fd10-4c4a-9d1a-e5765c759ff2"
+								},
+								{
+									"key": "tool_name",
+									"value": "YoudaoSuggest"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "上传文件模块",
+			"item": [
+				{
+					"name": "上传文档文件接口",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/E:/慕课-LLM课程/AI应用调试对话界面.txt"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/upload-files/file",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"upload-files",
+								"file"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "上传图片接口",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/E:/2024年3月21日-桌面整理/pOAdk08Y_400x400.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/upload-files/image",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"upload-files",
+								"image"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "知识库模块",
+			"item": [
+				{
+					"name": "创建知识库",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"icon\": \"https://imooc-llmops-1304251364.cos.ap-guangzhou.myqcloud.com/2024/09/29/9f5e42d4-e184-4e2c-88f2-0ef843749e3f.jpg\",\r\n    \"name\": \"知识库20\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/datasets",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取知识库详情",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "更新知识库详情",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"icon\": \"https://imooc-llmops-1304251364.cos.ap-guangzhou.myqcloud.com/2024/09/29/9f5e42d4-e184-4e2c-88f2-0ef843749e3f.jpg\",\r\n    \"name\": \"慕课LLMOps项目\",\r\n    \"description\": \"这是慕课LLMOps项目的资料库，涵盖了API文档、代码、流程图、翻译文档等。\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取知识库分页列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/datasets?search_word=&current_page=1&page_size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "search_word",
+									"value": ""
+								},
+								{
+									"key": "current_page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "在指定知识库下新增文档",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"upload_file_ids\": [\r\n        \"13c490be-51e0-4e77-b363-442002fab93d\"\r\n    ],\r\n    \"process_type\": \"automatic\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "知识库召回测试",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"retrieval_strategy\": \"hybrid\",\r\n    \"k\": 10,\r\n    \"query\": \"想学习flask，有什么建议么？\",\r\n    \"score\": 0.5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/hit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"hit"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定知识库最近的查询列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/queries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"queries"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "根据批处理标识获取处理进度",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents/batch/:batch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents",
+								"batch",
+								":batch"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								},
+								{
+									"key": "batch",
+									"value": "20241107093305267929"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定知识库的文档列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents?current_page=1&page_size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents"
+							],
+							"query": [
+								{
+									"key": "current_page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								},
+								{
+									"key": "search_word",
+									"value": "慕课网",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定文档基础信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents/:document_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents",
+								":document_id"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								},
+								{
+									"key": "document_id",
+									"value": "{{document_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "更新指定文档基础名称",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"项目提示词大全.md\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents/:document_id/name",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents",
+								":document_id",
+								"name"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								},
+								{
+									"key": "document_id",
+									"value": "{{document_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "更改指定文档的启用状态",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"enabled\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents/:document_id/enabled",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents",
+								":document_id",
+								"enabled"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								},
+								{
+									"key": "document_id",
+									"value": "091a0b4f-46c1-4ab0-9c44-4109bc18910c"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "删除指定文档信息",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents/:document_id/delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents",
+								":document_id",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								},
+								{
+									"key": "document_id",
+									"value": "091a0b4f-46c1-4ab0-9c44-4109bc18910c"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定文档的片段列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents/:document_id/segments?current_page=1&page_size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents",
+								":document_id",
+								"segments"
+							],
+							"query": [
+								{
+									"key": "current_page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								},
+								{
+									"key": "search_word",
+									"value": "测试",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								},
+								{
+									"key": "document_id",
+									"value": "{{document_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "更新文档片段的启用状态",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"enabled\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents/:document_id/segments/:segment_id/enabled",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents",
+								":document_id",
+								"segments",
+								":segment_id",
+								"enabled"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								},
+								{
+									"key": "document_id",
+									"value": "{{document_id}}"
+								},
+								{
+									"key": "segment_id",
+									"value": "df2676ee-80e3-4f2a-8264-e964737999d7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "查询文档片段信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents/:document_id/segments/:segment_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents",
+								":document_id",
+								"segments",
+								":segment_id"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								},
+								{
+									"key": "document_id",
+									"value": "{{document_id}}"
+								},
+								{
+									"key": "segment_id",
+									"value": "df2676ee-80e3-4f2a-8264-e964737999d7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "新增文档片段信息",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"这是一条用于删除的测试数据，来源于慕课网\",\r\n    \"keywords\": [\"慕课网\", \"程序员\", \"梦工厂\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents/:document_id/segments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents",
+								":document_id",
+								"segments"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								},
+								{
+									"key": "document_id",
+									"value": "{{document_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "删除指定文档片段信息",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents/:document_id/segments/:segment_id/delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents",
+								":document_id",
+								"segments",
+								":segment_id",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								},
+								{
+									"key": "document_id",
+									"value": "{{document_id}}"
+								},
+								{
+									"key": "segment_id",
+									"value": "df2676ee-80e3-4f2a-8264-e964737999d7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "删除指定知识库",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "4ae8c020-9d9a-4d31-a930-c3fdbc3e71e1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "修改文档片段内容",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"慕课网，程序员的梦工厂。\",\r\n    \"keywords\": [\"慕课\", \"工程\", \"梦\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/datasets/:dataset_id/documents/:document_id/segments/:segment_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"datasets",
+								":dataset_id",
+								"documents",
+								":document_id",
+								"segments",
+								":segment_id"
+							],
+							"variable": [
+								{
+									"key": "dataset_id",
+									"value": "{{dataset_id}}"
+								},
+								{
+									"key": "document_id",
+									"value": "{{document_id}}"
+								},
+								{
+									"key": "segment_id",
+									"value": "60aa1f04-bf17-4ea9-b17a-5ddaffd244b9"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "授权认证",
+			"item": [
+				{
+					"name": "获取指定第三方授权服务的重定向地址",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/oauth/:provider_name",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"oauth",
+								":provider_name"
+							],
+							"variable": [
+								{
+									"key": "provider_name",
+									"value": "github"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "指定第三方授权服务的授权地址",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"code\": \"bdcf7d7c2426f736df45\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/oauth/authorize/:provider_name",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"oauth",
+								"authorize",
+								":provider_name"
+							],
+							"variable": [
+								{
+									"key": "provider_name",
+									"value": "github"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "账号密码登录",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"zehuiya@163.com\",\r\n    \"password\": \"imooc.com123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/password-login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"password-login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "退出当前登录账号",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "账号模块",
+			"item": [
+				{
+					"name": "获取当前登录账号信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/account",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"account"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "修改当前登录账号密码",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"password\": \"zehuiya@imooc123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/account/password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"account",
+								"password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "修改当前登录账号名称",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"泽辉呀\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/account/name",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"account",
+								"name"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "修改当前登录账号头像",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"avatar\": \"https://imooc-llmops-1304251364.cos.ap-guangzhou.myqcloud.com/2024/11/06/3573ddfd-0a25-4414-99a4-2b2ffabbf4b8.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/account/avatar",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"account",
+								"avatar"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "AI辅助模块",
+			"item": [
+				{
+					"name": "利用AI优化预设Prompt",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"prompt\": \"你是一个拥有10年经验的前端工程师，请帮用户解决问题\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/ai/optimize-prompt",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ai",
+								"optimize-prompt"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "根据传递的消息id获取建议问题列表",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"message_id\": \"43104963-fb16-4dd7-b3cc-18d2916b1e75\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/ai/suggested-questions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ai",
+								"suggested-questions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "开放API模块",
+			"item": [
+				{
+					"name": "获取API秘钥分页列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/openapi/api-keys",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"openapi",
+								"api-keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "新增API秘钥",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"is_active\": false,\r\n    \"remark\": \"测试新增\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/openapi/api-keys",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"openapi",
+								"api-keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "修改API秘钥",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"is_active\": true,\r\n    \"remark\": \"慕课LLMOps项目专用秘钥\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/openapi/api-keys/:api_key_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"openapi",
+								"api-keys",
+								":api_key_id"
+							],
+							"variable": [
+								{
+									"key": "api_key_id",
+									"value": "388f46ba-52ef-4868-926e-0fa2853fec8b"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "修改API秘钥状态",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"is_active\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/openapi/api-keys/:api_key_id/is-active",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"openapi",
+								"api-keys",
+								":api_key_id",
+								"is-active"
+							],
+							"variable": [
+								{
+									"key": "api_key_id",
+									"value": "{{api_key_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "删除API秘钥",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/openapi/api-keys/:api_key_id/delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"openapi",
+								"api-keys",
+								":api_key_id",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "api_key_id",
+									"value": "388f46ba-52ef-4868-926e-0fa2853fec8b"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "开放 Chat 对话接口",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "llmops-v1/_SrNt1XzpuLjEbFZ3b7Qn32rjtxKZUo0xlQYF2W5x39DfDvrRETfnXfHQCr8wqCB",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"app_id\": \"{{app_id}}\",\r\n    \"query\": \"调用workflow_llmops_workflow()工作流，帮我搜索下LLMOps\",\r\n    \"stream\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/openapi/chat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"openapi",
+								"chat"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "内置应用模块",
+			"item": [
+				{
+					"name": "获取应用广场分类列表信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/builtin-apps/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"builtin-apps",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取内置应用模板列表信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/builtin-apps",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"builtin-apps"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "将指定 Agent 模板添加到工作区",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"builtin_app_id\": \"6b476bc2-fb11-4ff7-a24e-ae8ec30605f5\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/builtin-apps/add-builtin-app-to-space",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"builtin-apps",
+								"add-builtin-app-to-space"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "工作流模块",
+			"item": [
+				{
+					"name": "获取账号下的工作流分页数据",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workflows",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workflows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "在当前账号下新增工作流",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"工作流测试\",\r\n    \"tool_call_name\": \"GongZuoLiuCeShi123\",\r\n    \"icon\": \"https://imooc-llmops-1304251364.cos.ap-guangzhou.myqcloud.com/2024/12/06/153da84b-5a0c-4665-9745-9022eb846598.jpg\",\r\n    \"description\": \"这是一个工作流测试组件\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workflows",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workflows"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "修改工作流基础信息",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"这是已经修改后的名字\",\r\n    \"tool_call_name\": \"GongZuoLiuCeShi\",\r\n    \"icon\": \"https://imooc-llmops-1304251364.cos.ap-guangzhou.myqcloud.com/2024/12/06/153da84b-5a0c-4665-9745-9022eb846598.jpg\",\r\n    \"description\": \"这是一个工作流测试组件\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workflows/:workflow_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workflows",
+								":workflow_id"
+							],
+							"variable": [
+								{
+									"key": "workflow_id",
+									"value": "{{workflow_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取工作流基础信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workflows/:workflow_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workflows",
+								":workflow_id"
+							],
+							"variable": [
+								{
+									"key": "workflow_id",
+									"value": "{{workflow_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "删除指定的工作流",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workflows/:workflow_id/delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workflows",
+								":workflow_id",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "workflow_id",
+									"value": "20a07055-72d6-4b00-87ab-b47883a4cd7e"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "更新指定工作流的 graph 图草稿配置",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"edges\": [\r\n        {\r\n            \"id\": \"675fca50-1228-8008-82dc-0c714158534c\",\r\n            \"source\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n            \"source_type\": \"start\",\r\n            \"target\": \"868b5769-1925-4e7b-8aa4-af7c3d444d91\",\r\n            \"target_type\": \"dataset_retrieval\"\r\n        },\r\n        {\r\n            \"id\": \"675fcd37-f308-8008-a6f4-389a0b1ed0ca\",\r\n            \"source\": \"868b5769-1925-4e7b-8aa4-af7c3d444d91\",\r\n            \"source_type\": \"dataset_retrieval\",\r\n            \"target\": \"eba75e0b-21b7-46ed-8d21-791724f0740f\",\r\n            \"target_type\": \"llm\"\r\n        },\r\n        {\r\n            \"id\": \"675fa28c-6f94-8008-b5ae-2eba3300b2e6\",\r\n            \"source\": \"eba75e0b-21b7-46ed-8d21-791724f0740f\",\r\n            \"source_type\": \"llm\",\r\n            \"target\": \"4a9ed43d-e886-49f7-af9f-9e85d83b27aa\",\r\n            \"target_type\": \"code\"\r\n        },\r\n        {\r\n            \"id\": \"675f9964-0028-8008-8046-d017996f3d3c\",\r\n            \"source\": \"4a9ed43d-e886-49f7-af9f-9e85d83b27aa\",\r\n            \"source_type\": \"code\",\r\n            \"target\": \"860c8411-37ed-4872-b53f-30afa0290211\",\r\n            \"target_type\": \"end\"\r\n        },\r\n        {\r\n            \"id\": \"675f9290-5990-8008-ab62-5a0ff8d95edc\",\r\n            \"source\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n            \"source_type\": \"start\",\r\n            \"target\": \"675fca50-1228-8008-82dc-0c714158534c\",\r\n            \"target_type\": \"http_request\"\r\n        },\r\n        {\r\n            \"id\": \"675f90b4-7bb8-8008-8b72-ba26ce50951c\",\r\n            \"source\": \"675fca50-1228-8008-82dc-0c714158534c\",\r\n            \"source_type\": \"http_request\",\r\n            \"target\": \"623b7671-0bc2-446c-bf5e-5e25032a522e\",\r\n            \"target_type\": \"template_transform\"\r\n        },\r\n        {\r\n            \"id\": \"675f8c7e-e600-8008-885b-6a1271cb4365\",\r\n            \"source\": \"623b7671-0bc2-446c-bf5e-5e25032a522e\",\r\n            \"source_type\": \"template_transform\",\r\n            \"target\": \"860c8411-37ed-4872-b53f-30afa0290211\",\r\n            \"target_type\": \"end\"\r\n        },\r\n        {\r\n            \"id\": \"675f850a-de28-8008-9f27-d508d8337e49\",\r\n            \"source\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n            \"source_type\": \"start\",\r\n            \"target\": \"2f6cf40d-0219-421b-92ff-229fdde15ecb\",\r\n            \"target_type\": \"tool\"\r\n        },\r\n        {\r\n            \"id\": \"675f8403-cbf4-8008-9aae-76ecae12c675\",\r\n            \"source\": \"2f6cf40d-0219-421b-92ff-229fdde15ecb\",\r\n            \"source_type\": \"tool\",\r\n            \"target\": \"860c8411-37ed-4872-b53f-30afa0290211\",\r\n            \"target_type\": \"end\"\r\n        },\r\n        {\r\n            \"id\": \"c8732feb-9c6d-4528-8103-ad33af9a162a\",\r\n            \"source\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n            \"source_type\": \"start\",\r\n            \"target\": \"e9fc1f95-1a59-4ba4-a87d-2ad349287234\",\r\n            \"target_type\": \"tool\"\r\n        },\r\n        {\r\n            \"id\": \"51e993f4-a832-48bc-8211-59b37acf688c\",\r\n            \"source\": \"e9fc1f95-1a59-4ba4-a87d-2ad349287234\",\r\n            \"source_type\": \"tool\",\r\n            \"target\": \"860c8411-37ed-4872-b53f-30afa0290211\",\r\n            \"target_type\": \"end\"\r\n        }\r\n    ],\r\n    \"nodes\": [\r\n        {\r\n            \"description\": \"工作流的起点节点，支持定义工作流的起点输入等信息。\",\r\n            \"id\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n            \"inputs\": [\r\n                {\r\n                    \"description\": \"用户输入的query信息\",\r\n                    \"name\": \"query\",\r\n                    \"required\": true,\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": \"\",\r\n                        \"type\": \"generated\"\r\n                    }\r\n                },\r\n                {\r\n                    \"description\": \"需要查询的城市地址信息\",\r\n                    \"name\": \"location\",\r\n                    \"required\": false,\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": \"\",\r\n                        \"type\": \"generated\"\r\n                    }\r\n                },\r\n                {\r\n                    \"description\": \"是否输出\",\r\n                    \"name\": \"is_output\",\r\n                    \"required\": true,\r\n                    \"type\": \"boolean\",\r\n                    \"value\": {\r\n                        \"content\": \"\",\r\n                        \"type\": \"generated\"\r\n                    }\r\n                },\r\n                {\r\n                    \"description\": \"输出数量\",\r\n                    \"name\": \"output_count\",\r\n                    \"required\": true,\r\n                    \"type\": \"int\",\r\n                    \"value\": {\r\n                        \"content\": \"\",\r\n                        \"type\": \"generated\"\r\n                    }\r\n                }\r\n            ],\r\n            \"node_type\": \"start\",\r\n            \"title\": \"开始节点\",\r\n            \"position\": {\r\n                \"x\": 400,\r\n                \"y\": 400\r\n            }\r\n        },\r\n        {\r\n            \"dataset_ids\": [\r\n                \"1cbb6449-5463-49a4-b0ef-1b94cdf747d7\",\r\n                \"798f5324-c82e-44c2-94aa-035afbe88839\",\r\n                \"7544c95e-e198-40f1-b1ed-6905ba5f0c55\",\r\n                \"f3f28f75-8e60-4eba-b6df-4d1b390bbd89\"\r\n            ],\r\n            \"description\": \"\",\r\n            \"id\": \"868b5769-1925-4e7b-8aa4-af7c3d444d91\",\r\n            \"inputs\": [\r\n                {\r\n                    \"name\": \"query\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n                            \"ref_var_name\": \"query\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                }\r\n            ],\r\n            \"node_type\": \"dataset_retrieval\",\r\n            \"title\": \"知识库检索\"\r\n        },\r\n        {\r\n            \"description\": \"\",\r\n            \"id\": \"675fca50-1228-8008-82dc-0c714158534c\",\r\n            \"inputs\": [\r\n                {\r\n                    \"name\": \"search_word\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"type\": \"literal\",\r\n                        \"content\": \"慕课网\"\r\n                    },\r\n                    \"meta\": {\r\n                        \"type\": \"params\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"Authorization\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"type\": \"literal\",\r\n                        \"content\": \"xxx\"\r\n                    },\r\n                    \"meta\": {\r\n                        \"type\": \"headers\"\r\n                    }\r\n                }\r\n            ],\r\n            \"method\": \"get\",\r\n            \"node_type\": \"http_request\",\r\n            \"title\": \"HTTP请求\",\r\n            \"url\": \"https://www.langchain.com/\"\r\n        },\r\n        {\r\n            \"description\": \"\",\r\n            \"id\": \"eba75e0b-21b7-46ed-8d21-791724f0740f\",\r\n            \"inputs\": [\r\n                {\r\n                    \"name\": \"query\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n                            \"ref_var_name\": \"query\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"context\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"868b5769-1925-4e7b-8aa4-af7c3d444d91\",\r\n                            \"ref_var_name\": \"combine_documents\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                }\r\n            ],\r\n            \"model_config\": {\r\n                \"model\": \"gpt-4o-mini\",\r\n                \"parameters\": {\r\n                    \"frequency_penalty\": 0.2,\r\n                    \"max_tokens\": 8192,\r\n                    \"presence_penalty\": 0.2,\r\n                    \"temperature\": 0.5,\r\n                    \"top_p\": 0.85\r\n                },\r\n                \"provider\": \"openai\"\r\n            },\r\n            \"node_type\": \"llm\",\r\n            \"prompt\": \"你是一个强有力的AI机器人，请根据用户的提问回复特定的内容，用户的提问是: {{query}}。\\n\\n如果有必要，可以使用上下文内容进行回复，上下文内容:\\n\\n<context>{{context}}</context>\",\r\n            \"title\": \"大语言模型\",\r\n            \"position\": {\r\n                \"x\": 780,\r\n                \"y\": 280\r\n            }\r\n        },\r\n        {\r\n            \"description\": \"\",\r\n            \"id\": \"623b7671-0bc2-446c-bf5e-5e25032a522e\",\r\n            \"inputs\": [\r\n                {\r\n                    \"name\": \"location\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n                            \"ref_var_name\": \"location\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"query\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n                            \"ref_var_name\": \"query\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                }\r\n            ],\r\n            \"node_type\": \"template_transform\",\r\n            \"template\": \"地址: {{location}}\\n提问内容: {{query}}\",\r\n            \"title\": \"模板转换\"\r\n        },\r\n        {\r\n            \"code\": \"def main(params):\\n    return {\\n        \\\"first_100_documents\\\": params.get(\\\"combine_documents\\\", \\\"\\\")[:100]\\n    }\",\r\n            \"description\": \"\",\r\n            \"id\": \"4a9ed43d-e886-49f7-af9f-9e85d83b27aa\",\r\n            \"inputs\": [\r\n                {\r\n                    \"name\": \"combine_documents\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"868b5769-1925-4e7b-8aa4-af7c3d444d91\",\r\n                            \"ref_var_name\": \"combine_documents\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                }\r\n            ],\r\n            \"node_type\": \"code\",\r\n            \"outputs\": [\r\n                {\r\n                    \"name\": \"first_100_documents\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": \"\",\r\n                        \"type\": \"generated\"\r\n                    }\r\n                }\r\n            ],\r\n            \"title\": \"代码\"\r\n        },\r\n        {\r\n            \"description\": \"\",\r\n            \"id\": \"2f6cf40d-0219-421b-92ff-229fdde15ecb\",\r\n            \"inputs\": [\r\n                {\r\n                    \"name\": \"query\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n                            \"ref_var_name\": \"query\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                }\r\n            ],\r\n            \"node_type\": \"tool\",\r\n            \"provider_id\": \"google\",\r\n            \"title\": \"内置工具\",\r\n            \"tool_id\": \"google_serper\",\r\n            \"type\": \"builtin_tool\"\r\n        },\r\n        {\r\n            \"description\": \"\",\r\n            \"id\": \"e9fc1f95-1a59-4ba4-a87d-2ad349287234\",\r\n            \"inputs\": [],\r\n            \"node_type\": \"tool\",\r\n            \"provider_id\": \"bde70d64-cbcc-47e7-a0f5-b51200b87c7c\",\r\n            \"title\": \"API工具\",\r\n            \"tool_id\": \"BilibiliRs\",\r\n            \"type\": \"api_tool\"\r\n        },\r\n        {\r\n            \"description\": \"工作流的结束节点，支持定义工作流最终输出的变量等信息。\",\r\n            \"id\": \"860c8411-37ed-4872-b53f-30afa0290211\",\r\n            \"node_type\": \"end\",\r\n            \"outputs\": [\r\n                {\r\n                    \"name\": \"query\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n                            \"ref_var_name\": \"query\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"location\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"18d938c4-ecd7-4a6b-9403-3625224b96cc\",\r\n                            \"ref_var_name\": \"location\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"username\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": \"泽辉呀\",\r\n                        \"type\": \"literal\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"llm_output\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"eba75e0b-21b7-46ed-8d21-791724f0740f\",\r\n                            \"ref_var_name\": \"output\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"template_combine\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"623b7671-0bc2-446c-bf5e-5e25032a522e\",\r\n                            \"ref_var_name\": \"output\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"first_100_documents\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"4a9ed43d-e886-49f7-af9f-9e85d83b27aa\",\r\n                            \"ref_var_name\": \"first_100_documents\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"bilibili\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"e9fc1f95-1a59-4ba4-a87d-2ad349287234\",\r\n                            \"ref_var_name\": \"text\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"google_search_result\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"2f6cf40d-0219-421b-92ff-229fdde15ecb\",\r\n                            \"ref_var_name\": \"text\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"http_request_text\",\r\n                    \"type\": \"string\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"675fca50-1228-8008-82dc-0c714158534c\",\r\n                            \"ref_var_name\": \"text\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                },\r\n                {\r\n                    \"name\": \"http_request_status_code\",\r\n                    \"type\": \"int\",\r\n                    \"value\": {\r\n                        \"content\": {\r\n                            \"ref_node_id\": \"675fca50-1228-8008-82dc-0c714158534c\",\r\n                            \"ref_var_name\": \"status_code\"\r\n                        },\r\n                        \"type\": \"ref\"\r\n                    }\r\n                }\r\n            ],\r\n            \"title\": \"结束\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workflows/:workflow_id/draft-graph",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workflows",
+								":workflow_id",
+								"draft-graph"
+							],
+							"variable": [
+								{
+									"key": "workflow_id",
+									"value": "{{workflow_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定工作流的 graph 图草稿配置",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workflows/:workflow_id/draft-graph",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workflows",
+								":workflow_id",
+								"draft-graph"
+							],
+							"variable": [
+								{
+									"key": "workflow_id",
+									"value": "{{workflow_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "调试指定的工作流",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"query\": \"你知道什么是LLM吗？\",\r\n    \"location\": \"广州\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workflows/:workflow_id/debug",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workflows",
+								":workflow_id",
+								"debug"
+							],
+							"variable": [
+								{
+									"key": "workflow_id",
+									"value": "{{workflow_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "发布指定的工作流",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workflows/:workflow_id/publish",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workflows",
+								":workflow_id",
+								"publish"
+							],
+							"variable": [
+								{
+									"key": "workflow_id",
+									"value": "{{workflow_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取消发布指定的工作流",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workflows/:workflow_id/cancel-publish",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workflows",
+								":workflow_id",
+								"cancel-publish"
+							],
+							"variable": [
+								{
+									"key": "workflow_id",
+									"value": "{{workflow_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "语言模型模块",
+			"item": [
+				{
+					"name": "获取LLMOps语言模型列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/language-models",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"language-models"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定模型的详细信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/language-models/:provider_name/:model_name",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"language-models",
+								":provider_name",
+								":model_name"
+							],
+							"variable": [
+								{
+									"key": "provider_name",
+									"value": "wenxin"
+								},
+								{
+									"key": "model_name",
+									"value": "ernie-3.5-8k"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定模型对应icon图标",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/language-models/:provider_name/icon",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"language-models",
+								":provider_name",
+								"icon"
+							],
+							"variable": [
+								{
+									"key": "provider_name",
+									"value": "ollama"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "辅助Agent模块",
+			"item": [
+				{
+					"name": "与辅助 Agent 进行 Chat 对话",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"query\": \"创建一个养猫助手，谢谢\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/assistant-agent/chat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"assistant-agent",
+								"chat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "停止与辅助 Agent 的对话",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/assistant-agent/chat/:task_id/stop",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"assistant-agent",
+								"chat",
+								":task_id",
+								"stop"
+							],
+							"variable": [
+								{
+									"key": "task_id",
+									"value": "2ccedbb5-2452-4566-b84e-628972641661"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取当前登录账号的辅助 Agent 对话历史列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/assistant-agent/messages",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"assistant-agent",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "清空当前登录账号与辅助 Agent 的对话列表",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/assistant-agent/delete-conversation",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"assistant-agent",
+								"delete-conversation"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "统计分析模块",
+			"item": [
+				{
+					"name": "获取指定应用的统计分析数据",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/analysis/:app_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"analysis",
+								":app_id"
+							],
+							"variable": [
+								{
+									"key": "app_id",
+									"value": "{{app_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "WebApp模块",
+			"item": [
+				{
+					"name": "根据标识获取指定 WebApp 基础信息",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/web-apps/:token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"web-apps",
+								":token"
+							],
+							"variable": [
+								{
+									"key": "token",
+									"value": "{{token}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "与指定 WebApp 进行对话",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"query\": \"你是谁？\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/web-apps/:token/chat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"web-apps",
+								":token",
+								"chat"
+							],
+							"variable": [
+								{
+									"key": "token",
+									"value": "{{token}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "停止与指定 WebApp 进行对话",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/web-apps/:token/chat/:task_id/stop",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"web-apps",
+								":token",
+								"chat",
+								":task_id",
+								"stop"
+							],
+							"variable": [
+								{
+									"key": "token",
+									"value": "{{token}}"
+								},
+								{
+									"key": "task_id",
+									"value": "84c5710b-7dba-4f89-9f07-15f4cacbdd3c"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定应用的会话列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/web-apps/:token/conversations?is_pinned=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"web-apps",
+								":token",
+								"conversations"
+							],
+							"query": [
+								{
+									"key": "is_pinned",
+									"value": "true"
+								}
+							],
+							"variable": [
+								{
+									"key": "token",
+									"value": "{{token}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "会话模块",
+			"item": [
+				{
+					"name": "获取指定会话的消息列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/conversations/:conversation_id/messages?current_page=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"conversations",
+								":conversation_id",
+								"messages"
+							],
+							"query": [
+								{
+									"key": "current_page",
+									"value": "1"
+								}
+							],
+							"variable": [
+								{
+									"key": "conversation_id",
+									"value": "377f0a00-f1d5-4303-a5d7-b02f1ef70558"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "删除特定的会话",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/conversations/:conversation_id/delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"conversations",
+								":conversation_id",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "conversation_id",
+									"value": "aa758088-76fa-4be8-b8eb-00521d1e486d"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "删除特定会话下的指定消息",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/conversations/:conversation_id/messages/:message_id/delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"conversations",
+								":conversation_id",
+								"messages",
+								":message_id",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "conversation_id",
+									"value": "377f0a00-f1d5-4303-a5d7-b02f1ef70558"
+								},
+								{
+									"key": "message_id",
+									"value": "0c66353e-228e-4ed2-8c37-b085145b0be2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取指定会话的名称",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/conversations/:conversation_id/name",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"conversations",
+								":conversation_id",
+								"name"
+							],
+							"variable": [
+								{
+									"key": "conversation_id",
+									"value": "377f0a00-f1d5-4303-a5d7-b02f1ef70558"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "修改指定会话的名称",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"人类与LLM的对话\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/conversations/:conversation_id/name",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"conversations",
+								":conversation_id",
+								"name"
+							],
+							"variable": [
+								{
+									"key": "conversation_id",
+									"value": "377f0a00-f1d5-4303-a5d7-b02f1ef70558"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "置顶或取消置顶某个会话",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"is_pinned\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/conversations/:conversation_id/is-pinned",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"conversations",
+								":conversation_id",
+								"is-pinned"
+							],
+							"variable": [
+								{
+									"key": "conversation_id",
+									"value": "377f0a00-f1d5-4303-a5d7-b02f1ef70558"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "接口测试",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:5000/ping",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NmRiMzBkMS0zMTk5LTRlNzktYTBjZC1hYmYxMmZhNjg1OGYiLCJpc3MiOiJsbG1vcHMiLCJleHAiOjE3Mzg2NjM3MTF9.CW9lVqwq-bJCZoqvy6-xXLITPMGdgfl5KXylNh61q-A",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
