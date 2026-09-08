@@ -1,11 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-@Time    : 2024/7/2 8:32
-@Author  : thezehui@gmail.com
-@File    : 1.自定义加载器使用技巧.py
-"""
-from typing import Iterator, AsyncIterator
+from typing import AsyncIterator, Iterator
 
 from langchain_core.document_loaders import BaseLoader
 from langchain_core.documents import Document
