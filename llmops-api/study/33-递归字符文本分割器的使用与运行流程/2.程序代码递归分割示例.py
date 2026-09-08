@@ -1,12 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-@Time    : 2024/7/2 8:21
-@Author  : thezehui@gmail.com
-@File    : 2.程序代码递归分割示例.py
-"""
 from langchain_community.document_loaders import UnstructuredFileLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter, Language
+from langchain_text_splitters import Language, RecursiveCharacterTextSplitter
 
 loader = UnstructuredFileLoader("./demo.py")
 documents = loader.load()

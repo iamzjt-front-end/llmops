@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-@Time    : 2024/7/2 14:39
-@Author  : thezehui@gmail.com
-@File    : 1.递归字符文本分割器示例.py
-"""
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
