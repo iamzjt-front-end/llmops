@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-@Time    : 2024/7/2 14:55
-@Author  : thezehui@gmail.com
-@File    : 2.其他文档分割器使用示例.py
-"""
 from langchain_text_splitters import HTMLHeaderTextSplitter
 
 # 1.构建文本与分割标题

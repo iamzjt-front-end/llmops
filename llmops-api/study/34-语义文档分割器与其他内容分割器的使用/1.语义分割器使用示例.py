@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-@Time    : 2024/7/2 14:33
-@Author  : thezehui@gmail.com
-@File    : 1.语义分割器使用示例.py
-"""
 import dotenv
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_experimental.text_splitter import SemanticChunker
