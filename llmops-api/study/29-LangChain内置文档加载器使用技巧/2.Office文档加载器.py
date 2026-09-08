@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-@Time    : 2024/7/1 18:46
-@Author  : thezehui@gmail.com
-@File    : 2.Office文档加载器.py
-"""
 from langchain_community.document_loaders import (
     UnstructuredPowerPointLoader,
 )
