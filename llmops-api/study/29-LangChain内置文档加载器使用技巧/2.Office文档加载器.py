@@ -1,5 +1,5 @@
 from langchain_community.document_loaders import (
-    UnstructuredPowerPointLoader,
+  UnstructuredPowerPointLoader,
 )
 
 # excel_loader = UnstructuredExcelLoader("./员工考勤表.xlsx", mode="elements")
@@ -8,7 +8,7 @@ from langchain_community.document_loaders import (
 # word_loader = UnstructuredWordDocumentLoader("./喵喵.docx")
 # documents = word_loader.load()
 
-ppt_loader = UnstructuredPowerPointLoader("./章节介绍.pptx")
+ppt_loader = UnstructuredPowerPointLoader('./章节介绍.pptx')
 documents = ppt_loader.load()
 
 print(documents)

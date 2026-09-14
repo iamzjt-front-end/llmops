@@ -5,6 +5,7 @@
 @Author  : thezehui@gmail.com
 @File    : 1.问答转换器示例.py
 """
+
 import dotenv
 from doctran import Doctran
 from langchain_community.document_transformers import DoctranQATransformer
@@ -38,9 +39,9 @@ jason@psychic.dev"""
 documents = [Document(page_content=page_content)]
 
 # 2.构建问答转换器并转换
-qa_transformer = DoctranQATransformer(openai_api_model="gpt-3.5-turbo-16k")
+qa_transformer = DoctranQATransformer(openai_api_model='gpt-3.5-turbo-16k')
 transformer_documents = qa_transformer.transform_documents(documents)
 
 # 3.输出内容
-for qa in transformer_documents[0].metadata.get("questions_and_answers"):
-    print("问答数据:", qa)
+for qa in transformer_documents[0].metadata.get('questions_and_answers'):
+  print('问答数据:', qa)

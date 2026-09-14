@@ -5,6 +5,7 @@
 @Author  : thezehui@gmail.com
 @File    : 2.翻译转换器示例.py
 """
+
 import dotenv
 from langchain_community.document_transformers import DoctranTextTranslator
 from langchain_core.documents import Document
@@ -35,7 +36,7 @@ jason@psychic.dev"""
 documents = [Document(page_content=page_content)]
 
 # 2.构建翻译转换器并翻译
-text_translator = DoctranTextTranslator(openai_api_model="gpt-3.5-turbo-16k")
+text_translator = DoctranTextTranslator(openai_api_model='gpt-3.5-turbo-16k')
 translator_documents = text_translator.transform_documents(documents)
 
 # 3.输出翻译内容

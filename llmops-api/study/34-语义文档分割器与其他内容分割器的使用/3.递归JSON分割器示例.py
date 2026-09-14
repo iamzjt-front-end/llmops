@@ -4,7 +4,7 @@ import requests
 from langchain_text_splitters import RecursiveJsonSplitter
 
 # 1.获取并加载json
-url = "https://api.smith.langchain.com/openapi.json"
+url = 'https://api.smith.langchain.com/openapi.json'
 json_data = requests.get(url).json()
 print(len(json.dumps(json_data)))
 
@@ -18,6 +18,6 @@ chunks = text_splitter.create_documents(json_chunks)
 # 4.输出内容
 count = 0
 for chunk in chunks:
-    count += len(chunk.page_content)
+  count += len(chunk.page_content)
 
 print(count)
