@@ -12,6 +12,7 @@ from langchain_core.runnables import RunnableConfig, RunnableLambda, RunnablePas
 from langchain_core.tracers import Run
 from langchain_deepseek import ChatDeepSeek
 
+from internal.core.tools.builtin_tools.providers import ProviderFactory
 from internal.exception import FailException
 from internal.schema.app_schema import CompletionReq
 from internal.service import AppService
@@ -24,6 +25,7 @@ class AppHandler:
   """应用控制器"""
 
   app_service: AppService
+  provider_factory: ProviderFactory
 
   def create_app(self):
     """调用服务创建新的App记录"""
@@ -121,4 +123,9 @@ class AppHandler:
     return success_json({'content': content})
 
   def ping(self):
-    raise FailException('数据未找到')
+    google = self.provider_factory.get_provider('google')
+    google_serper_entity = google.get_tool_entity('google_serper')
+    print('🚀 google_serper_entity:', google_serper_entity)
+
+    return success_json()
+    # raise FailException('数据未找到')
