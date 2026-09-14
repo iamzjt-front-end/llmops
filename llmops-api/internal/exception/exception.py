@@ -19,7 +19,6 @@ class FailException(CustomException):
   """通用失败异常"""
 
 
-
 class NotFoundException(CustomException):
   """未找到异常"""
 
