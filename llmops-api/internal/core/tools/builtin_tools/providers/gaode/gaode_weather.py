@@ -1,13 +1,10 @@
 import json
 import os
-from typing import Any, Type
+from typing import Any
 
-import dotenv
 import requests
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
-
-dotenv.load_dotenv()
 
 
 class GaodeWeatherArgsSchema(BaseModel):
@@ -19,7 +16,7 @@ class GaodeWeatherTool(BaseTool):
 
   name: str = 'gaode_weather'
   description: str = '当你想查询天气或者与天气相关的问题时可以使用的工具'
-  args_schema: Type[BaseModel] = GaodeWeatherArgsSchema
+  args_schema: type[BaseModel] = GaodeWeatherArgsSchema
 
   def _run(self, *args: Any, **kwargs: Any) -> str:
     """根据传入的城市名称运行调用api获取城市对应的天气预报信息"""
@@ -27,7 +24,7 @@ class GaodeWeatherTool(BaseTool):
       # 1.获取高德API秘钥，如果没有创建的话，则抛出错误
       gaode_api_key = os.getenv('GAODE_API_KEY')
       if not gaode_api_key:
-        return f'高德开放平台API未配置'
+        return '高德开放平台API未配置'
 
       # 2.从参数中获取city城市名字
       city = kwargs.get('city', '')
@@ -57,10 +54,10 @@ class GaodeWeatherTool(BaseTool):
           # 5.返回最后的结果字符串
           return json.dumps(weather_data)
       return f'获取{city}天气预报信息失败'
-    except Exception as e:
+    except (requests.RequestException, KeyError, IndexError):
       return f'获取{kwargs.get("city", "")}天气预报信息失败'
 
 
-gaode_weather = GaodeWeatherTool()
-
-print(gaode_weather.invoke({'city': '深圳'}))
+def gaode_weather(**kwargs) -> BaseTool:
+  """获取高德天气预报查询工具"""
+  return GaodeWeatherTool()
