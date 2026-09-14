@@ -13,7 +13,6 @@ from langchain_core.tracers import Run
 from langchain_deepseek import ChatDeepSeek
 
 from internal.core.tools.builtin_tools.providers import ProviderFactory
-from internal.exception import FailException
 from internal.schema.app_schema import CompletionReq
 from internal.service import AppService
 from pkg.response import success_json, success_message, validate_error_json
@@ -123,9 +122,6 @@ class AppHandler:
     return success_json({'content': content})
 
   def ping(self):
-    google = self.provider_factory.get_provider('google')
-    google_serper_entity = google.get_tool_entity('google_serper')
-    print('🚀 google_serper_entity:', google_serper_entity)
-
-    return success_json()
+    providers = self.provider_factory.get_provider_entities()
+    return success_json([provider.model_dump() for provider in providers])
     # raise FailException('数据未找到')
