@@ -3,8 +3,9 @@ from langchain_community.tools.openai_dalle_image_generation import (
 )
 from langchain_community.utilities.dalle_image_generator import DallEAPIWrapper
 from langchain_core.tools import BaseTool
-from internal.lib.helper import add_attribute
 from pydantic import BaseModel, Field
+
+from internal.lib.helper import add_attribute
 
 
 class Dalle3ArgsSchema(BaseModel):

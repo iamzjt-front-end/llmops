@@ -1,8 +1,9 @@
 from langchain_community.tools import GoogleSerperRun
 from langchain_community.utilities import GoogleSerperAPIWrapper
 from langchain_core.tools import BaseTool
-from internal.lib.helper import add_attribute
 from pydantic import BaseModel, Field
+
+from internal.lib.helper import add_attribute
 
 
 class GoogleSerperArgsSchema(BaseModel):

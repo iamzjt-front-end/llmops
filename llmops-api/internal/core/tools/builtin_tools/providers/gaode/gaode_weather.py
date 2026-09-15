@@ -4,8 +4,9 @@ from typing import Any
 
 import requests
 from langchain_core.tools import BaseTool
-from internal.lib.helper import add_attribute
 from pydantic import BaseModel, Field
+
+from internal.lib.helper import add_attribute
 
 
 class GaodeWeatherArgsSchema(BaseModel):
