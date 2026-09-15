@@ -36,7 +36,7 @@ class BuiltinToolService:
         # 5.构建工具实体信息
         tool_dict = {
           **tool_entities.model_dump(),
-          'input': self.get_tool_input(tool),
+          'inputs': self.get_tool_inputs(tool),
         }
         builtin_tool['tools'].append(tool_dict)
 
@@ -62,14 +62,15 @@ class BuiltinToolService:
     # 4.组装提供商和工具实体信息
     provider_entity = provider.provider_entity
     builtin_tool = {
-      'provider': {**provider_entity.model_dump(exclude={'icon'})},
+      'provider': {**provider_entity.model_dump(exclude={'icon', 'created_at'})},
       **tool_entity.model_dump(),
-      'input': self.get_tool_input(tool),
+      'inputs': self.get_tool_inputs(tool),
+      'created_at': provider_entity.created_at,
     }
     return builtin_tool
 
   @classmethod
-  def get_tool_input(cls, tool: str) -> list:
+  def get_tool_inputs(cls, tool: str) -> list:
     """根据传入的工具获取input信息"""
     inputs = []
 
