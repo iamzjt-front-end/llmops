@@ -1,5 +1,5 @@
-import os
-from typing import Any
+from pathlib import Path
+from typing import Any, ClassVar
 
 import yaml
 from injector import inject, singleton
@@ -12,13 +12,13 @@ from internal.core.tools.builtin_tools.entities import Provider, ProviderEntity
 class BuiltinProviderManager:
   """服务提供商工厂类"""
 
-  provider_map: dict[str, Provider] = {}
+  provider_map: ClassVar[dict[str, Provider]] = {}
 
   def __init__(self):
     """构造函数，初始化对应的provider_tool_map"""
     self._get_provider_tools_map()
 
-  def get_provider(self, provider_name: str) -> Provider:
+  def get_provider(self, provider_name: str) -> Provider | None:
     """根据传递的名字获取服务提供商"""
     return self.provider_map.get(provider_name)
 
@@ -44,9 +44,8 @@ class BuiltinProviderManager:
       return
 
     # 2.获取当前文件/类所在的文件夹路径
-    current_path: str = os.path.abspath(__file__)
-    providers_path = os.path.dirname(current_path)
-    providers_yaml_path = os.path.join(providers_path, 'providers.yaml')
+    providers_path = Path(__file__).resolve().parent
+    providers_yaml_path = providers_path / 'providers.yaml'
 
     # 3.读取providers.yaml的数据
     with open(providers_yaml_path, encoding='utf-8') as f:

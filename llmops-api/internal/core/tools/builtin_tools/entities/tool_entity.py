@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -25,11 +25,11 @@ class ToolParam(BaseModel):
   # 是否必填
   required: bool = False
   # 默认值
-  default: Optional[Any] = None
+  default: Any | None = None
   # 最小值
-  min: Optional[float] = None
+  min: float | None = None
   # 最大值
-  max: Optional[float] = None
+  max: float | None = None
   # 下拉菜单选项列表
   options: list[dict[str, Any]] = Field(default_factory=list)
 
