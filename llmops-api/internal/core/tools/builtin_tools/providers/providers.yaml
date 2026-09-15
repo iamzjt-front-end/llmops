@@ -4,12 +4,14 @@
   icon: icon.svg
   background: "#E5E7EB"
   category: 网络搜索
+  created_at: 1722498386
 - name: time
   label: 时间
   description: 一个用于获取当前时间的工具
   icon: icon.svg
   background: "#E5E7EB"
   category: 实用工具
+  created_at: 1722498386
 - name: duckduckgo
   label: DuckDuckGo
   description: 一个注重隐私的搜索引擎。

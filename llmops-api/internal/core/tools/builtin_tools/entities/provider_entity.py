@@ -24,6 +24,8 @@ class ProviderEntity(BaseModel):
   background: str
   # 分类信息
   category: str = ''
+  # 提供商/工具的创建时间戳
+  created_at: int = 0
 
 
 class Provider(BaseModel):
