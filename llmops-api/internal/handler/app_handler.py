@@ -12,7 +12,7 @@ from langchain_core.runnables import RunnableConfig, RunnableLambda, RunnablePas
 from langchain_core.tracers import Run
 from langchain_deepseek import ChatDeepSeek
 
-from internal.core.tools.builtin_tools.providers import ProviderFactory
+from internal.core.tools.builtin_tools.providers import BuiltinProviderManager
 from internal.schema.app_schema import CompletionReq
 from internal.service import AppService
 from pkg.response import success_json, success_message, validate_error_json
@@ -24,7 +24,7 @@ class AppHandler:
   """应用控制器"""
 
   app_service: AppService
-  provider_factory: ProviderFactory
+  builtin_provider_manager: BuiltinProviderManager
 
   def create_app(self):
     """调用服务创建新的App记录"""
@@ -122,6 +122,5 @@ class AppHandler:
     return success_json({'content': content})
 
   def ping(self):
-    providers = self.provider_factory.get_provider_entities()
-    return success_json([provider.model_dump() for provider in providers])
+    return success_json()
     # raise FailException('数据未找到')

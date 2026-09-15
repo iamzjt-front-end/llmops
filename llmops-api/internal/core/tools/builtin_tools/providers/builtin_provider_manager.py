@@ -9,7 +9,7 @@ from internal.core.tools.builtin_tools.entities import Provider, ProviderEntity
 
 @inject
 @singleton
-class ProviderFactory:
+class BuiltinProviderManager:
   """服务提供商工厂类"""
 
   provider_map: dict[str, Provider] = {}
