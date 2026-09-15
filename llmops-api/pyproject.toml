@@ -4,6 +4,9 @@ line-length = 88
 indent-width = 2
 extend-exclude = ["venv"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["app", "config", "internal", "pkg"]
+
 [tool.ruff.format]
 indent-style = "space"
 quote-style = "single"
