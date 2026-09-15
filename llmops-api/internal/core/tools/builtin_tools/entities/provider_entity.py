@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -62,19 +62,18 @@ class Provider(BaseModel):
   def _provider_init(self):
     """服务提供商初始化函数"""
     # 1.获取当前类的路径，计算得到对应服务提供商的路径
-    current_path = os.path.abspath(__file__)
-    entities_path = os.path.dirname(current_path)
-    provider_path = os.path.join(os.path.dirname(entities_path), 'providers', self.name)
+    builtin_tools_path = Path(__file__).resolve().parent.parent
+    provider_path = builtin_tools_path / 'providers' / self.name
 
     # 2.组装获取positions.yaml数据
-    position_yaml_path = os.path.join(provider_path, 'positions.yaml')
+    position_yaml_path = provider_path / 'positions.yaml'
     with open(position_yaml_path, encoding='utf-8') as f:
       position_yaml_data = yaml.safe_load(f)
 
     # 3.循环读取位置信息获取服务提供商的工具名字
     for tool_name in position_yaml_data:
       # 4.获取工具的yaml数据
-      tool_yaml_path = os.path.join(provider_path, f'{tool_name}.yaml')
+      tool_yaml_path = provider_path / f'{tool_name}.yaml'
       with open(tool_yaml_path, encoding='utf-8') as f:
         tool_yaml_data = yaml.safe_load(f)
 
