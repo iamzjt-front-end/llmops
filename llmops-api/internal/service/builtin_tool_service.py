@@ -1,4 +1,6 @@
+import mimetypes
 from dataclasses import dataclass
+from pathlib import Path
 
 from injector import inject
 from pydantic import BaseModel
@@ -68,6 +70,38 @@ class BuiltinToolService:
       'created_at': provider_entity.created_at,
     }
     return builtin_tool
+
+  def get_provider_icon(self, provider_name: str) -> tuple[bytes, str]:
+    """根据传递的提供商获取icon流信息"""
+    # 1.获取对应的工具提供者
+    provider = self.builtin_provider_manager.get_provider(provider_name)
+    if not provider:
+      raise NotFoundException(f'该工具提供者{provider_name}不存在')
+
+    # 2.从当前文件定位内置工具提供商目录
+    internal_path = Path(__file__).resolve().parents[1]
+    provider_path = internal_path / 'core' / 'tools' / 'builtin_tools'
+    provider_path = provider_path / 'providers' / provider_name
+
+    # 3.拼接得到icon对应的路径
+    icon_path = provider_path / '_asset' / provider.provider_entity.icon
+
+    # 4.检测icon是否存在
+    if not icon_path.exists():
+      raise NotFoundException(f'该工具提供者{provider_name}/_asset下未提供图标')
+
+    # 5.读取icon的类型
+    mimetype, _ = mimetypes.guess_type(icon_path)
+    mimetype = mimetype or 'application/octet-stream'
+
+    # 6.读取icon的字节数据
+    with open(icon_path, 'rb') as f:
+      byte_data = f.read()
+      return byte_data, mimetype
+
+  def get_categories(self) -> list:
+    """获取所有内置提供商的分类信息，涵盖了category、name、icon"""
+    return []
 
   @classmethod
   def get_tool_inputs(cls, tool: str) -> list:

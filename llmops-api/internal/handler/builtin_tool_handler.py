@@ -1,5 +1,7 @@
+import io
 from dataclasses import dataclass
 
+from flask import send_file
 from injector import inject
 
 from internal.service.builtin_tool_service import BuiltinToolService
@@ -22,3 +24,13 @@ class BuiltinToolHandler:
     """根据传递的提供商名字＋工具名字，获取指定的工具"""
     builtin_tool = self.builtin_tool_service.get_provider_tool(provider_name, tool_name)
     return success_json(builtin_tool)
+
+  def get_provider_icon(self, provider_name: str):
+    """根据传递的提供商获取icon流信息"""
+    icon, mimetype = self.builtin_tool_service.get_provider_icon(provider_name)
+    return send_file(io.BytesIO(icon), mimetype=mimetype)
+
+  def get_categories(self):
+    """获取所有内置提供商的分类信息"""
+    categories = self.builtin_tool_service.get_categories()
+    return success_json(categories)
