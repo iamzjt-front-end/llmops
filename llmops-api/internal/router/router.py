@@ -78,7 +78,7 @@ class Router:
 
     # 4.自定义API插件模块
     bp.add_url_rule(
-      '/api-tools/validate-openai-schema',
+      '/api-tools/validate-openapi-schema',
       methods=['POST'],
       view_func=self.api_tool_handler.validate_openai_schema,
     )
