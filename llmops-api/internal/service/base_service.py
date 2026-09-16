@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from internal.exception import FailException
 from pkg.sqlalchemy import SQLAlchemy
@@ -32,6 +32,6 @@ class BaseService:
           raise FailException('更新数据失败')
     return model_instance
 
-  def get(self, model: Any, primary_key: Any) -> Optional[Any]:
+  def get(self, model: Any, primary_key: Any) -> Any | None:
     """根据传递的模型类+主键的信息获取唯一数据"""
-    return self.db.session.query(model).get(primary_key)
+    return self.db.session.get(model, primary_key)
