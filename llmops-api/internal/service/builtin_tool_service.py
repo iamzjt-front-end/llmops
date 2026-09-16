@@ -2,10 +2,10 @@ import mimetypes
 from dataclasses import dataclass
 from pathlib import Path
 
-from internal.core.tools.builtin_tools.categories import BuiltinCategoryManager
 from injector import inject
 from pydantic import BaseModel
 
+from internal.core.tools.builtin_tools.categories import BuiltinCategoryManager
 from internal.core.tools.builtin_tools.providers import BuiltinProviderManager
 from internal.exception import NotFoundException
 

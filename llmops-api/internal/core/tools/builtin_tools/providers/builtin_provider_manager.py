@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any
 
 import yaml
 from injector import inject, singleton
