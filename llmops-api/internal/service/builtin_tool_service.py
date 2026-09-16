@@ -2,6 +2,7 @@ import mimetypes
 from dataclasses import dataclass
 from pathlib import Path
 
+from internal.core.tools.builtin_tools.categories import BuiltinCategoryManager
 from injector import inject
 from pydantic import BaseModel
 
@@ -15,6 +16,7 @@ class BuiltinToolService:
   """内置工具服务"""
 
   builtin_provider_manager: BuiltinProviderManager
+  builtin_category_manager: BuiltinCategoryManager
 
   def get_builtin_tools(self) -> list:
     """获取LLMOps所有内置提供商＋工具信息"""
@@ -101,7 +103,15 @@ class BuiltinToolService:
 
   def get_categories(self) -> list:
     """获取所有内置提供商的分类信息，涵盖了category、name、icon"""
-    return []
+    category_map = self.builtin_category_manager.get_category_map()
+    return [
+      {
+        'name': category['entity'].name,
+        'category': category['entity'].category,
+        'icon': category['icon'],
+      }
+      for category in category_map.values()
+    ]
 
   @classmethod
   def get_tool_inputs(cls, tool: str) -> list:
