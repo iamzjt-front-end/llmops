@@ -179,3 +179,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
+
+# internal/lib 为项目源码目录(通用工具模块),不受上方 lib/ 构建产物规则影响;
+# 同时保留 lib/ 规则,避免课件目录中的同名文件夹被纳入版本管理
+!llmops-api/internal/lib/
+!llmops-api/internal/lib/**
