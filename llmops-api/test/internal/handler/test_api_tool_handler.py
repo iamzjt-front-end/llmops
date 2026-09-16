@@ -1,8 +1,49 @@
 import pytest
 
+from internal.model import ApiTool, ApiToolProvider
 from pkg.response import HttpCode
 
 openapi_schema_string = """{"server": "https://baidu.com", "description": "123", "paths": {"/location": {"get": {"description": "获取本地位置", "operationId":"xxx", "parameters":[{"name":"location", "in":"query", "description":"参数描述", "required":true, "type":"str"}]}}}}"""
+
+ACCOUNT_ID = '46db30d1-3199-4e79-a0cd-abf12fa6858f'
+GAODE_PROVIDER_ID = '3944eee4-9d5a-4ca5-91c1-e56654cbc1e4'
+MUTABLE_PROVIDER_ID = 'b1ffd31f-5cbb-4b35-bc8f-4bafabd78817'
+
+
+@pytest.fixture(autouse=True)
+def api_tool_data(db):
+  """为每个接口用例创建可回滚的插件测试数据。"""
+  providers = [
+    ApiToolProvider(
+      id=GAODE_PROVIDER_ID,
+      account_id=ACCOUNT_ID,
+      name='高德工具包',
+      icon='https://cdn.example.com/gaode.png',
+      description='高德测试工具包',
+      openapi_schema=openapi_schema_string,
+      headers=[],
+    ),
+    ApiToolProvider(
+      id=MUTABLE_PROVIDER_ID,
+      account_id=ACCOUNT_ID,
+      name='待修改工具包',
+      icon='https://cdn.example.com/mutable.png',
+      description='用于更新和删除测试',
+      openapi_schema=openapi_schema_string,
+      headers=[],
+    ),
+  ]
+  tool = ApiTool(
+    account_id=ACCOUNT_ID,
+    provider_id=GAODE_PROVIDER_ID,
+    name='GetLocationForIp',
+    description='根据 IP 获取位置',
+    url='https://gaode.example.com/ip',
+    method='get',
+    parameters=[],
+  )
+  db.session.add_all([*providers, tool])
+  db.session.flush()
 
 
 class TestApiToolHandler:
@@ -77,15 +118,13 @@ class TestApiToolHandler:
     resp = client.post('/api-tools', json=data)
     assert resp.status_code == 200
 
-    from internal.model import ApiToolProvider
-
     api_tool_provider = (
       db.session.query(ApiToolProvider).filter_by(name='慕课学习工具包').one_or_none()
     )
     assert api_tool_provider is not None
 
   def test_update_api_tool_provider(self, client, db):
-    provider_id = 'b1ffd31f-5cbb-4b35-bc8f-4bafabd78817'
+    provider_id = MUTABLE_PROVIDER_ID
     data = {
       'name': 'test_update_api_tool_provider',
       'icon': 'https://cdn.imooc.com/icon.png',
@@ -95,18 +134,14 @@ class TestApiToolHandler:
     resp = client.post(f'/api-tools/{provider_id}', json=data)
     assert resp.status_code == 200
 
-    from internal.model import ApiToolProvider
-
-    api_tool_provider = db.session.query(ApiToolProvider).get(provider_id)
+    api_tool_provider = db.session.get(ApiToolProvider, provider_id)
     assert api_tool_provider.name == data.get('name')
 
   def test_delete_api_tool_provider(self, client, db):
-    provider_id = 'b1ffd31f-5cbb-4b35-bc8f-4bafabd78817'
+    provider_id = MUTABLE_PROVIDER_ID
     resp = client.post(f'/api-tools/{provider_id}/delete')
     assert resp.status_code == 200
     assert resp.json.get('code') == HttpCode.SUCCESS
 
-    from internal.model import ApiToolProvider
-
-    api_tool_provider = db.session.query(ApiToolProvider).get(provider_id)
+    api_tool_provider = db.session.get(ApiToolProvider, provider_id)
     assert api_tool_provider is None
