@@ -9,6 +9,6 @@ class ValidateOpenAPISchema(FlaskForm):
   openapi_schema = StringField(
     'openapi_schema',
     validators=[
-      DataRequired(message='openai_schema字符串不能为空'),
+      DataRequired(message='openapi_schema字符串不能为空'),
     ],
   )
