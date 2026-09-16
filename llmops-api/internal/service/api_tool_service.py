@@ -217,9 +217,10 @@ class ApiToolService(BaseService):
     """解析传递的openapi_schema字符串，如果出错则抛出错误"""
     try:
       data = json.loads(openapi_schema_str.strip())
-      if not isinstance(data, dict):
-        raise
-    except Exception as e:
+    except (AttributeError, TypeError, json.JSONDecodeError) as exc:
+      raise ValidateErrorException('传递数据必须符合OpenAPI规范的JSON字符串') from exc
+
+    if not isinstance(data, dict):
       raise ValidateErrorException('传递数据必须符合OpenAPI规范的JSON字符串')
 
     return OpenAPISchema(**data)
