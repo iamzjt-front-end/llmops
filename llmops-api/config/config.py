@@ -1,7 +1,7 @@
 import os
 from typing import Any
 
-from .defaul_config import DEFAULT_CONFIG
+from .default_config import DEFAULT_CONFIG
 
 
 def _get_env(key: str) -> Any:
