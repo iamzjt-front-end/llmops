@@ -37,15 +37,12 @@ class App(db.Model):
   status = Column(
     String(255), nullable=False, server_default=text("''::character varying")
   )
-  update_at = Column(
+  updated_at = Column(
     DateTime,
     nullable=False,
     server_default=text('CURRENT_TIMESTAMP(0)'),
     server_onupdate=text('CURRENT_TIMESTAMP(0)'),
   )
-  create_at = Column(
-    DateTime,
-    nullable=False,
-    server_default=text('CURRENT_TIMESTAMP(0)'),
-    server_onupdate=text('CURRENT_TIMESTAMP(0)'),
+  created_at = Column(
+    DateTime, nullable=False, server_default=text('CURRENT_TIMESTAMP(0)')
   )
