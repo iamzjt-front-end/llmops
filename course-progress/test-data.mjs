@@ -28,6 +28,13 @@ assert.ok(
   ),
   "every lesson should contain the fields required by the UI",
 );
+assert.ok(
+  data.lessons.every((lesson) =>
+    lesson.durationSeconds === undefined ||
+    (Number.isSafeInteger(lesson.durationSeconds) && lesson.durationSeconds >= 0),
+  ),
+  "lesson durations should be non-negative whole seconds when present",
+);
 assert.equal(
   new Set(
     data.lessons.map((lesson) =>

@@ -4,6 +4,8 @@ AI Agent 全栈开发工程师课程的学习进度网页，共 546 节视频、
 
 每个章支持一键全选或取消全选；部分完成时会显示中间状态。
 
+每节视频的时长由课程源视频的媒体信息生成，页面按已勾选小节累计学习时长。若某个已完成小节尚无时长数据，右上角会显示“待补”，避免把不完整的合计误报为总时长。
+
 线上地址：<https://llmops-course-progress.itsjtide.workers.dev>
 
 ## 进度保存在哪里
@@ -32,6 +34,12 @@ npm run build
 ```
 
 构建产物会生成在 `dist/`，不会提交到 Git。
+
+重新生成课程清单时，`generate-course-data.rb` 会通过 `ffprobe` 读取每个源视频的时长（秒）；请确保已安装 FFmpeg，并让课程目录可访问。NAS 上的课程也可以通过 SSH 直接读取媒体元数据，不会下载视频：
+
+```bash
+ruby generate-course-data.rb --ssh iamzjt@192.168.31.182 '/vol1/1000/Course/【mkw体系课】AI Agent全栈开发工程师'
+```
 
 ## Cloudflare 部署
 

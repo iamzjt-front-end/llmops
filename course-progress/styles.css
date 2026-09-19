@@ -646,7 +646,8 @@ kbd {
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
     "label percent"
-    "track count";
+    "track count"
+    "time time";
   gap: 4px 10px;
   align-items: center;
   padding: 8px 10px;
@@ -713,6 +714,24 @@ kbd {
   font-size: 9px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.toolbar-progress-time {
+  grid-area: time;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 3px;
+  border-top: 1px solid var(--line);
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.toolbar-progress-time strong {
+  color: var(--text);
+  font-size: inherit;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
 }
 
 .results-meta {
@@ -980,6 +999,14 @@ kbd {
   transition: color 160ms ease, background-color 160ms ease;
 }
 
+.lesson-main {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+}
+
 .lesson-row::before {
   position: absolute;
   inset: 5px -10px;
@@ -1063,9 +1090,20 @@ kbd {
   line-height: 1.55;
 }
 
+.lesson-duration {
+  color: var(--muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .lesson-row.is-complete .lesson-name {
   text-decoration: line-through;
   text-decoration-color: rgba(152, 158, 141, 0.55);
+}
+
+.lesson-row.is-complete .lesson-duration {
+  color: inherit;
 }
 
 .lesson-code {
@@ -1372,7 +1410,9 @@ footer {
     width: 100%;
     min-width: 0;
     grid-template-columns: auto auto minmax(0, 1fr) auto;
-    grid-template-areas: "label percent track count";
+    grid-template-areas:
+      "label percent track count"
+      "time time time time";
     gap: 0 10px;
   }
 

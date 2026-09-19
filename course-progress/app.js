@@ -11,6 +11,11 @@ import {
   getBulkSelectionState,
   toggleBulkSelection,
 } from "./progress-selection.mjs";
+import {
+  formatLearnedDuration,
+  formatLessonDuration,
+  getLearnedDuration,
+} from "./lesson-duration.mjs";
 
 (function () {
   "use strict";
@@ -85,6 +90,7 @@ import {
     toolbarProgressPercent: document.querySelector("#toolbar-progress-percent"),
     toolbarProgressFill: document.querySelector("#toolbar-progress-fill"),
     toolbarProgressCount: document.querySelector("#toolbar-progress-count"),
+    toolbarProgressTime: document.querySelector("#toolbar-progress-time"),
     resultsCount: document.querySelector("#results-count"),
     activeContext: document.querySelector("#active-context"),
     courseList: document.querySelector("#course-list"),
@@ -292,9 +298,12 @@ import {
     elements.toolbarProgressPercent.textContent = displayPercent;
     elements.toolbarProgressFill.style.width = `${percent}%`;
     elements.toolbarProgressCount.textContent = `${completed} / ${total} 节`;
+    const learnedDuration = getLearnedDuration(lessons, state.completed);
+    const learnedDurationLabel = formatLearnedDuration(learnedDuration);
+    elements.toolbarProgressTime.textContent = learnedDurationLabel;
     elements.toolbarProgress.setAttribute(
       "aria-label",
-      `整体学习进度 ${displayPercent}，已完成 ${completed} 节，共 ${total} 节，点击返回顶部总览`,
+      `整体学习进度 ${displayPercent}，已完成 ${completed} 节，共 ${total} 节，已学时长 ${learnedDurationLabel}${learnedDuration.missingCount > 0 ? `，${learnedDuration.missingCount} 节时长待补` : ""}，点击返回顶部总览`,
     );
     elements.completedCount.textContent = String(completed);
     elements.remainingCount.textContent = String(remaining);
@@ -528,7 +537,10 @@ import {
             <svg viewBox="0 0 16 16"><path d="m3 8 3 3 7-7" /></svg>
           </span>
         </label>
-        <span class="lesson-name">${escapeHtml(lesson.title)}</span>
+        <span class="lesson-main">
+          <span class="lesson-name">${escapeHtml(lesson.title)}</span>
+          <span class="lesson-duration" aria-label="视频时长 ${escapeAttribute(formatLessonDuration(lesson.durationSeconds))}">${formatLessonDuration(lesson.durationSeconds)}</span>
+        </span>
         <span class="lesson-code">${escapeHtml(lesson.code || String(lesson.order))}</span>
       </div>
     `;
