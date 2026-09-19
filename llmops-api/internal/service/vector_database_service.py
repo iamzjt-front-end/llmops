@@ -1,41 +1,54 @@
+import atexit
 import os
+from functools import cached_property
 
 import weaviate
-from injector import inject
+from injector import inject, singleton
 from langchain_core.documents import Document
 from langchain_core.vectorstores import VectorStoreRetriever
-from langchain_openai import OpenAIEmbeddings
 from langchain_weaviate import WeaviateVectorStore
 from weaviate import WeaviateClient
+from weaviate.collections import Collection
+
+from .embeddings_service import EmbeddingsService
+
+COLLECTION_NAME = 'Dataset'
 
 
+@singleton
 @inject
 class VectorDatabaseService:
-  """向量数据库服务"""
+  """向量数据库服务，首次访问时连接并复用客户端。"""
 
-  client: WeaviateClient
-  vector_store: WeaviateVectorStore
+  def __init__(self, embeddings_service: EmbeddingsService):
+    self.embeddings_service = embeddings_service
 
-  def __init__(self):
-    """构造函数，完成向量数据库服务的客户端+LangChain向量数据库实例的创建"""
-    # 1.创建/连接weaviate向量数据库
-    self.client = weaviate.connect_to_local(
-      host=os.getenv('WEAVIATE_HOST'), port=int(os.getenv('WEAVIATE_PORT'))
+  @cached_property
+  def client(self) -> WeaviateClient:
+    client = weaviate.connect_to_local(
+      host=os.getenv('WEAVIATE_HOST', 'localhost'),
+      port=int(os.getenv('WEAVIATE_PORT', '8080')),
+      grpc_port=int(os.getenv('WEAVIATE_GRPC_PORT', '50051')),
     )
+    atexit.register(client.close)
+    return client
 
-    # 2.创建LangChain向量数据库
-    self.vector_store = WeaviateVectorStore(
+  @cached_property
+  def vector_store(self) -> WeaviateVectorStore:
+    return WeaviateVectorStore(
       client=self.client,
-      index_name='Dataset',
+      index_name=COLLECTION_NAME,
       text_key='text',
-      embedding=OpenAIEmbeddings(model='text-embedding-3-small'),
+      embedding=self.embeddings_service.cache_backed_embeddings,
     )
 
   def get_retriever(self) -> VectorStoreRetriever:
-    """获取检索器"""
     return self.vector_store.as_retriever()
 
   @classmethod
   def combine_documents(cls, documents: list[Document]) -> str:
-    """将对应的文档列表使用换行符进行合并"""
-    return '\n\n'.join([document.page_content for document in documents])
+    return '\n\n'.join(document.page_content for document in documents)
+
+  @property
+  def collection(self) -> Collection:
+    return self.client.collections.get(COLLECTION_NAME)

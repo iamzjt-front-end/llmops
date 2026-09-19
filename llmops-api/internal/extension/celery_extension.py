@@ -15,7 +15,11 @@ def init_app(app: Flask):
   # 1.创建Celery应用并配置
   celery_app = Celery(app.name, task_cls=FlaskTask)
   celery_app.config_from_object(app.config['CELERY'])
-  celery_app.conf.imports = ('internal.task.demo_task',)
+  celery_app.conf.imports = (
+    'internal.task.dataset_task',
+    'internal.task.document_task',
+    'internal.task.demo_task',
+  )
   celery_app.set_default()
 
   # 2.将celery挂在到app的扩展中
