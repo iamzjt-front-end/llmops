@@ -96,3 +96,84 @@ export const get = <T>(url: string, options = {}) => {
 export const post = <T>(url: string, options = {}) => {
   return request<T>(url, Object.assign({}, options, { method: 'POST' }))
 }
+
+// 封装基于 POST 的 SSE 流式事件请求。Promise 会在服务端流结束后才 resolve。
+export const ssePost = async (
+  url: string,
+  fetchOptions: FetchOptionType,
+  onData: (data: { event: string; data: Record<string, any> }) => void,
+): Promise<void> => {
+  const options = Object.assign({}, baseFetchOptions, { method: 'POST' }, fetchOptions)
+  const urlWithPrefix = `${apiPrefix}${url.startsWith('/') ? url : `/${url}`}`
+
+  const { body } = fetchOptions
+  if (body) options.body = JSON.stringify(body)
+
+  let response: Response
+  try {
+    response = await globalThis.fetch(urlWithPrefix, options as RequestInit)
+  } catch (error) {
+    Message.error('网络请求失败')
+    throw error
+  }
+
+  if (!response.ok || !response.body) {
+    const error = new Error('网络请求失败')
+    Message.error(error.message)
+    throw error
+  }
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder('utf-8')
+  let buffer = ''
+
+  const parseBlock = (block: string) => {
+    let event = 'message'
+    const dataLines: string[] = []
+
+    for (const rawLine of block.split(/\r?\n/)) {
+      if (rawLine.startsWith('event:')) {
+        event = rawLine.slice(6).trim()
+      } else if (rawLine.startsWith('data:')) {
+        dataLines.push(rawLine.slice(5).trimStart())
+      }
+    }
+
+    if (!dataLines.length) return
+    const data = JSON.parse(dataLines.join('\n'))
+    onData({ event, data })
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    const read = (): void => {
+      reader
+        .read()
+        .then((result) => {
+          buffer += decoder.decode(result.value, { stream: true })
+          const blocks = buffer.split(/\r?\n\r?\n/)
+          buffer = blocks.pop() ?? ''
+
+          try {
+            blocks.forEach(parseBlock)
+          } catch (error) {
+            reader.cancel().catch(() => undefined)
+            Message.error('流式响应解析失败')
+            reject(error)
+            return
+          }
+
+          if (result.done) {
+            resolve()
+            return
+          }
+          read()
+        })
+        .catch((error) => {
+          Message.error('网络请求失败')
+          reject(error)
+        })
+    }
+
+    read()
+  })
+}

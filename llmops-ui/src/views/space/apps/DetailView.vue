@@ -32,12 +32,21 @@ const send = async () => {
     query.value = ''
     isLoading.value = true
 
-    const response = await debugApp(route.params.app_id as string, humanQuery)
-    const content = response.data.content
-
     messages.value.push({
       role: 'ai',
-      content: content,
+      content: '',
+    })
+
+    await debugApp(route.params.app_id as string, humanQuery, (event_response) => {
+      const event = event_response?.event
+      const data = event_response?.data
+
+      if (event === 'agent_message') {
+        // 兼容当前 API 的 answer 字段与课件示例中的 data.data 字段。
+        const chunk_content = data?.answer ?? data?.data ?? ''
+        const lastIndex = messages.value.length - 1
+        messages.value[lastIndex].content += chunk_content
+      }
     })
   } finally {
     isLoading.value = false
@@ -109,6 +118,7 @@ const send = async () => {
                 class="max-w-max bg-gray-100 text-gray-900 border border-gray-200 px-4 py-3 rounded-2xl leading-5"
               >
                 {{ message.content }}
+                <span v-if="isLoading && message.role === 'ai'" class="cursor" />
               </div>
             </div>
           </div>
@@ -121,22 +131,6 @@ const send = async () => {
               <icon-apps />
             </a-avatar>
             <div class="text-2xl font-semibold text-gray-900">ChatGPT聊天机器人</div>
-          </div>
-          <!-- AI加载状态 -->
-          <div v-if="isLoading" class="flex flex-row gap-2 mb-6">
-            <!-- 头像 -->
-            <a-avatar :style="{ backgroundColor: '#00d0b6' }" class="flex-shrink-0" :size="30">
-              <icon-apps />
-            </a-avatar>
-            <!-- 实际消息 -->
-            <div class="flex flex-col gap-2">
-              <div class="font-semibold text-gray-700">ChatGPT聊天机器人</div>
-              <div
-                class="max-w-max bg-gray-100 text-gray-900 border border-gray-200 px-4 py-3 rounded-2xl leading-5"
-              >
-                <icon-loading />
-              </div>
-            </div>
           </div>
         </div>
         <!-- 调试对话输入框 -->
@@ -176,4 +170,23 @@ const send = async () => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.cursor {
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background-color: #444444;
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+</style>

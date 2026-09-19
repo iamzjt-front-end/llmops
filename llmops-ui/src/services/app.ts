@@ -1,8 +1,17 @@
-import { post } from '@/utils/request'
-import { type DebugAppResponse } from '@/models/app'
+import { ssePost } from '@/utils/request'
 
-export const debugApp = (app_id: string, query: string) => {
-  return post<DebugAppResponse>(`/apps/${app_id}/debug`, {
-    body: { query },
-  })
+export type DebugStreamEvent = { event: string; data: Record<string, any> }
+
+export const debugApp = (
+  app_id: string,
+  query: string,
+  onData: (event_response: DebugStreamEvent) => void,
+) => {
+  return ssePost(
+    `/apps/${app_id}/debug`,
+    {
+      body: { query },
+    },
+    onData,
+  )
 }
