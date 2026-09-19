@@ -15,10 +15,9 @@ from internal.core.agent.entities.queue_entity import QueueEvent
 from internal.core.file_extractor import FileExtractor
 from internal.entity.conversation_entity import InvokeFrom
 from internal.entity.dataset_entity import DEFAULT_PROCESS_RULE
-from internal.handler.app_handler import AppHandler
-from internal.lib.chat_history import FileChatMessageHistory
+from internal.model import Account
 from internal.schema.document_schema import CreateDocumentsReq
-from internal.service import ProcessRuleService
+from internal.service import AppService, JwtService, ProcessRuleService
 
 
 def queue_manager():
@@ -85,6 +84,39 @@ def test_agent_tool_call_round_trip():
   assert events[-1].answer == '3'
 
 
+def test_agent_input_and_output_review():
+  input_review_agent = FunctionCallAgent(
+    AgentConfig(
+      llm=FakeListChatModel(responses=['不应调用']),
+      review_config={
+        'enable': True,
+        'keywords': ['敏感词'],
+        'inputs_config': {'enable': True, 'preset_response': '内容无法处理'},
+        'outputs_config': {'enable': False},
+      },
+    ),
+    queue_manager(),
+  )
+  events = list(input_review_agent.run('这里有敏感词'))
+  assert [event.answer for event in events] == ['内容无法处理']
+
+  output_review_agent = FunctionCallAgent(
+    AgentConfig(
+      llm=FakeListChatModel(responses=['包含秘密的回答']),
+      review_config={
+        'enable': True,
+        'keywords': ['秘密'],
+        'inputs_config': {'enable': False, 'preset_response': ''},
+        'outputs_config': {'enable': True},
+      },
+    ),
+    queue_manager(),
+  )
+  assert ''.join(event.answer for event in output_review_agent.run('正常问题')) == (
+    '包含**的回答'
+  )
+
+
 def test_queue_timeout_and_stop():
   manager = queue_manager()
   assert list(manager.listen(timeout=0.01))[-1].event == QueueEvent.TIMEOUT
@@ -93,26 +125,31 @@ def test_queue_timeout_and_stop():
   assert list(manager.listen(timeout=2))[-1].event == QueueEvent.STOP
 
 
-def test_agent_sse_endpoint(client, monkeypatch, tmp_path):
-  monkeypatch.setattr(
-    AppHandler, '_get_llm', staticmethod(lambda: FakeListChatModel(responses=['你好']))
+def test_agent_sse_endpoint(client, db, monkeypatch):
+  account_id = uuid.uuid4()
+  db.session.add(
+    Account(
+      id=account_id,
+      name='测试账号',
+      email='agent@example.com',
+      avatar='',
+      last_login_ip='127.0.0.1',
+    )
   )
+  db.session.flush()
+  monkeypatch.setenv('JWT_SECRET_KEY', 'test-jwt-secret-at-least-32-bytes')
+  token = JwtService.generate_token({'sub': str(account_id)})
   monkeypatch.setattr(
-    AppHandler,
-    '_get_chat_history',
-    staticmethod(lambda _: FileChatMessageHistory(str(tmp_path / 'history.json'))),
+    AppService,
+    'debug_chat',
+    lambda self, app_id, query, account: iter(
+      ['event: agent_message\ndata: {"answer": "你好"}\n\n']
+    ),
   )
-  for name in ['SERPER_API_KEY', 'GAODE_API_KEY', 'OPENAI_API_KEY']:
-    monkeypatch.delenv(name, raising=False)
-  from app.http.module import injector
-
-  handler = injector.get(AppHandler)
-  monkeypatch.setattr(handler.redis_client, 'setex', Mock())
-  monkeypatch.setattr(handler.redis_client, 'get', Mock(return_value=None))
   response = client.post(
     f'/apps/{uuid.uuid4()}/debug',
     json={'query': '你好'},
-    headers={'Accept': 'text/event-stream'},
+    headers={'Authorization': f'Bearer {token}'},
   )
   assert response.mimetype == 'text/event-stream'
   events = [
@@ -121,7 +158,6 @@ def test_agent_sse_endpoint(client, monkeypatch, tmp_path):
     if line.startswith('data: ')
   ]
   assert ''.join(event['answer'] for event in events) == '你好'
-  assert len(FileChatMessageHistory(str(tmp_path / 'history.json')).messages) == 2
 
 
 @pytest.mark.parametrize(

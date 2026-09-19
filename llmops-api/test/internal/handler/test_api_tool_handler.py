@@ -1,6 +1,7 @@
 import pytest
 
-from internal.model import ApiTool, ApiToolProvider
+from internal.model import Account, ApiTool, ApiToolProvider
+from internal.service import JwtService
 from pkg.response import HttpCode
 
 openapi_schema_string = """{"server": "https://baidu.com", "description": "123", "paths": {"/location": {"get": {"description": "获取本地位置", "operationId":"xxx", "parameters":[{"name":"location", "in":"query", "description":"参数描述", "required":true, "type":"str"}]}}}}"""
@@ -11,8 +12,16 @@ MUTABLE_PROVIDER_ID = 'b1ffd31f-5cbb-4b35-bc8f-4bafabd78817'
 
 
 @pytest.fixture(autouse=True)
-def api_tool_data(db):
+def api_tool_data(db, client, monkeypatch):
   """为每个接口用例创建可回滚的插件测试数据。"""
+  monkeypatch.setenv('JWT_SECRET_KEY', 'test-jwt-secret-at-least-32-bytes')
+  account = Account(
+    id=ACCOUNT_ID,
+    name='测试账号',
+    email='test@example.com',
+    avatar='',
+    last_login_ip='127.0.0.1',
+  )
   providers = [
     ApiToolProvider(
       id=GAODE_PROVIDER_ID,
@@ -42,8 +51,10 @@ def api_tool_data(db):
     method='get',
     parameters=[],
   )
-  db.session.add_all([*providers, tool])
+  db.session.add_all([account, *providers, tool])
   db.session.flush()
+  token = JwtService.generate_token({'sub': ACCOUNT_ID})
+  client.environ_base['HTTP_AUTHORIZATION'] = f'Bearer {token}'
 
 
 class TestApiToolHandler:

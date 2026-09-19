@@ -4,6 +4,8 @@ from langchain_core.tools import BaseTool
 from langgraph.graph import MessagesState
 from pydantic import BaseModel, Field
 
+from internal.entity.app_entity import DEFAULT_APP_CONFIG
+
 # Agent智能体系统预设提示词模板
 AGENT_SYSTEM_PROMPT_TEMPLATE = """你是一个高度定制的智能体应用，旨在为用户提供准确、专业的内容生成和问题解答，请严格遵守以下规则：
 
@@ -50,9 +52,21 @@ class AgentConfig(BaseModel):
   # 智能体使用的工具列表
   tools: list[BaseTool] = Field(default_factory=list)
 
+  # 工具调用最大迭代次数与输入/输出审核配置
+  max_iteration_count: int = 5
+  review_config: dict = Field(
+    default_factory=lambda: deepcopy(DEFAULT_APP_CONFIG['review_config'])
+  )
+
 
 class AgentState(MessagesState):
   """智能体状态类"""
 
   history: list[AnyMessage]  # 短期记忆(历史记录)
   long_term_memory: str  # 长期记忆
+  iteration_count: int  # Agent工具调用迭代次数
+
+
+DATASET_RETRIEVAL_TOOL_NAME = 'dataset_retrieval'
+MAX_ITERATION_RESPONSE = '当前Agent迭代次数已超过限制，请重试'
+from copy import deepcopy

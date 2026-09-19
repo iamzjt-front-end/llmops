@@ -1,4 +1,5 @@
 import json
+import re
 import time
 import uuid
 from collections.abc import Generator
@@ -6,6 +7,7 @@ from threading import Thread
 from typing import Literal
 
 from langchain_core.messages import (
+  AIMessage,
   AnyMessage,
   HumanMessage,
   RemoveMessage,
@@ -17,7 +19,11 @@ from langgraph.constants import END
 from langgraph.graph import StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
-from internal.core.agent.entities.agent_entity import AgentState
+from internal.core.agent.entities.agent_entity import (
+  DATASET_RETRIEVAL_TOOL_NAME,
+  MAX_ITERATION_RESPONSE,
+  AgentState,
+)
 from internal.core.agent.entities.queue_entity import AgentQueueEvent, QueueEvent
 from internal.exception import FailException
 
@@ -30,13 +36,32 @@ class FunctionCallAgent(BaseAgent):
   def run(
     self,
     query: str,
-    history: list[AnyMessage] = None,
+    history: list[AnyMessage] | None = None,
     long_term_memory: str = '',
   ) -> Generator[AgentQueueEvent, None, None]:
     """运行智能体应用，并使用yield关键字返回对应的数据"""
     # 1.预处理传递的数据
     if history is None:
       history = []
+
+    # 输入审核命中敏感词时直接返回预设回复，不再调用模型。
+    review_config = self.agent_config.review_config
+    input_config = review_config.get('inputs_config', {})
+    if (
+      review_config.get('enable')
+      and input_config.get('enable')
+      and any(keyword in query for keyword in review_config.get('keywords', []))
+    ):
+      preset_response = input_config.get('preset_response', '')
+      yield AgentQueueEvent(
+        id=uuid.uuid4(),
+        task_id=self.agent_queue_manager.task_id,
+        event=QueueEvent.AGENT_MESSAGE,
+        thought=preset_response,
+        answer=preset_response,
+        latency=0,
+      )
+      return
 
     # 2.调用函数构建智能体
     agent = self._build_graph()
@@ -49,9 +74,10 @@ class FunctionCallAgent(BaseAgent):
             'messages': [HumanMessage(content=query)],
             'history': history,
             'long_term_memory': long_term_memory,
+            'iteration_count': 0,
           }
         )
-      except Exception as error:
+      except Exception as error:  # noqa: BLE001
         self.agent_queue_manager.publish_error(error)
       finally:
         self.agent_queue_manager.stop_listen()
@@ -126,7 +152,23 @@ class FunctionCallAgent(BaseAgent):
 
   def _llm_node(self, state: AgentState) -> AgentState:
     """大语言模型节点"""
-    # 1.从智能体配置中提取大语言模型
+    # 1.超过工具调用最大迭代次数时返回固定提示，避免无限循环。
+    if state.get('iteration_count', 0) >= self.agent_config.max_iteration_count:
+      response = MAX_ITERATION_RESPONSE
+      self.agent_queue_manager.publish(
+        AgentQueueEvent(
+          id=uuid.uuid4(),
+          task_id=self.agent_queue_manager.task_id,
+          event=QueueEvent.AGENT_MESSAGE,
+          thought=response,
+          messages=messages_to_dict(state['messages']),
+          answer=response,
+          latency=0,
+        )
+      )
+      return {'messages': [AIMessage(content=response)]}
+
+    # 2.从智能体配置中提取大语言模型
     id = uuid.uuid4()
     start_at = time.perf_counter()
     llm = self.agent_config.llm
@@ -134,7 +176,7 @@ class FunctionCallAgent(BaseAgent):
     # 2.检测大语言模型实例是否有bind_tools方法，如果没有则不绑定，如果有还需要检测tools是否为空，不为空则绑定
     if (
       hasattr(llm, 'bind_tools')
-      and callable(getattr(llm, 'bind_tools'))
+      and callable(llm.bind_tools)
       and len(self.agent_config.tools) > 0
     ):
       llm = llm.bind_tools(self.agent_config.tools)
@@ -143,6 +185,10 @@ class FunctionCallAgent(BaseAgent):
     gathered = None
     is_first_chunk = True
     generation_type = ''
+    review_config = self.agent_config.review_config
+    output_config = review_config.get('outputs_config', {})
+    output_review_enabled = review_config.get('enable') and output_config.get('enable')
+    raw_answer = ''
     for chunk in llm.stream(state['messages']):
       if self.agent_queue_manager.closed.is_set():
         raise FailException('智能体任务已结束')
@@ -161,17 +207,37 @@ class FunctionCallAgent(BaseAgent):
 
       # 5.如果生成的是消息则提交智能体消息事件
       if generation_type == 'message':
-        self.agent_queue_manager.publish(
-          AgentQueueEvent(
-            id=id,
-            task_id=self.agent_queue_manager.task_id,
-            event=QueueEvent.AGENT_MESSAGE,
-            thought=chunk.content,
-            messages=messages_to_dict(state['messages']),
-            answer=chunk.content,
-            latency=(time.perf_counter() - start_at),
+        content = chunk.content
+        if output_review_enabled:
+          raw_answer += content
+        else:
+          self.agent_queue_manager.publish(
+            AgentQueueEvent(
+              id=id,
+              task_id=self.agent_queue_manager.task_id,
+              event=QueueEvent.AGENT_MESSAGE,
+              thought=content,
+              messages=messages_to_dict(state['messages']),
+              answer=content,
+              latency=(time.perf_counter() - start_at),
+            )
           )
+
+    if output_review_enabled and generation_type == 'message':
+      content = raw_answer
+      for keyword in review_config.get('keywords', []):
+        content = re.sub(re.escape(keyword), '**', content, flags=re.IGNORECASE)
+      self.agent_queue_manager.publish(
+        AgentQueueEvent(
+          id=id,
+          task_id=self.agent_queue_manager.task_id,
+          event=QueueEvent.AGENT_MESSAGE,
+          thought=content,
+          messages=messages_to_dict(state['messages']),
+          answer=content,
+          latency=(time.perf_counter() - start_at),
         )
+      )
 
     # 6.如果类型为推理则添加智能体推理事件
     if generation_type == 'thought':
@@ -222,7 +288,7 @@ class FunctionCallAgent(BaseAgent):
       # 7.判断执行工具的名字，提交不同事件，涵盖智能体动作以及知识库检索
       event = (
         QueueEvent.AGENT_ACTION
-        if tool_call['name'] != 'dataset_retrieval'
+        if tool_call['name'] != DATASET_RETRIEVAL_TOOL_NAME
         else QueueEvent.DATASET_RETRIEVAL
       )
       self.agent_queue_manager.publish(
@@ -237,7 +303,10 @@ class FunctionCallAgent(BaseAgent):
         )
       )
 
-    return {'messages': messages}
+    return {
+      'messages': messages,
+      'iteration_count': state.get('iteration_count', 0) + 1,
+    }
 
   @classmethod
   def _tools_condition(cls, state: AgentState) -> Literal['tools', '__end__']:
