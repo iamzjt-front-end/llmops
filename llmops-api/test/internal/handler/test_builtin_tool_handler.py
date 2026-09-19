@@ -24,6 +24,7 @@ class TestBuiltinToolHandler:
     'provider_name, tool_name',
     [
       ('google', 'google_serper'),
+      ('wikipedia', 'wikipedia_search'),
       ('imooc', 'imooc_llmops'),
     ],
   )
@@ -31,13 +32,13 @@ class TestBuiltinToolHandler:
     """测试获取指定工具信息接口"""
     resp = client.get(f'/builtin-tools/{provider_name}/tools/{tool_name}')
     assert resp.status_code == 200
-    if provider_name == 'google':
+    if provider_name in {'google', 'wikipedia'}:
       assert resp.json.get('code') == HttpCode.SUCCESS
       assert resp.json.get('data').get('name') == tool_name
     elif provider_name == 'imooc':
       assert resp.json.get('code') == HttpCode.NOT_FOUND
 
-  @pytest.mark.parametrize('provider_name', ['google', 'imooc'])
+  @pytest.mark.parametrize('provider_name', ['google', 'wikipedia', 'imooc'])
   def test_get_provider_icon(self, provider_name, client):
     """测试根据提供商名字获取icon接口"""
     resp = client.get(f'/builtin-tools/{provider_name}/icon')
