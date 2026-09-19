@@ -9,6 +9,8 @@ from sqlalchemy import (
   PrimaryKeyConstraint,
   String,
   Text,
+  asc,
+  func,
   text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -48,6 +50,16 @@ class Conversation(db.Model):
   created_at = Column(
     DateTime, nullable=False, server_default=text('CURRENT_TIMESTAMP(0)')
   )
+
+  @property
+  def is_new(self) -> bool:
+    """判断当前会话是否仍处于首轮消息阶段。"""
+    message_count = (
+      db.session.query(func.count(Message.id))
+      .filter(Message.conversation_id == self.id)
+      .scalar()
+    )
+    return message_count <= 1
 
 
 class Message(db.Model):
@@ -129,6 +141,16 @@ class Message(db.Model):
   created_at = Column(
     DateTime, nullable=False, server_default=text('CURRENT_TIMESTAMP(0)')
   )
+
+  @property
+  def agent_thoughts(self) -> list['MessageAgentThought']:
+    """按执行顺序返回该消息关联的智能体推理步骤。"""
+    return (
+      db.session.query(MessageAgentThought)
+      .filter(MessageAgentThought.message_id == self.id)
+      .order_by(asc('position'))
+      .all()
+    )
 
 
 class MessageAgentThought(db.Model):
